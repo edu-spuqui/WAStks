@@ -1,0 +1,115 @@
+body {
+	--light-color:					17,27,33;
+	--light-color-title:			17,27,33;
+	--light-background-color:		245,241,235;
+	--light-background-title:		255,255,255;
+	--light-background-img:			url('/assets/bg_light.webp');
+	--light-background-input:		255,255,255;
+	--light-background-myinput:		217,253,211;
+	--light-background-sysinput:	252,252,251;
+	--light-background-sys:			255,255,255;
+	--light-custom-green:			28,170,96;
+	
+	--avd-light-color:				17,27,33;
+	--avd-light-color-title:		17,27,33;
+	--avd-light-background-color:	245,241,235;
+	--avd-light-background-title:	255,255,255;
+	--avd-light-background-img:		url('/assets/bg_light.webp');
+	--avd-light-background-input:	255,255,255;
+	--avd-light-background-myinput:	217,253,211;
+	--avd-light-background-sysinput:252,252,251;
+	--avd-light-background-sys:		255,255,255;
+	--avd-light-custom-green:		28,170,96;
+	
+	--dark-color:					229,237,236;
+	--dark-color-title:				239,241,243;
+	--dark-background-color:		10,16,19;
+	--dark-background-title:		10,16,19;
+	--dark-background-img:			url('/assets/bg_dark.png');
+	--dark-background-input:		30,39,41;
+	--dark-background-myinput:		18,77,54;
+	--dark-background-sysinput:		17,23,26;
+	--dark-background-sys:			19,19,19;
+	--dark-custom-green:			31,192,99;
+
+	--avd-dark-color:				233,237,239;
+	--avd-dark-color-title:			233,237,239;
+	--avd-dark-background-color:	0,20,20;
+	--avd-dark-background-title:	0,20,20;
+	--avd-dark-background-img:		url('/assets/bg_avddark.webp');
+	--avd-dark-background-input:	34,39,43;
+	--avd-dark-background-myinput:	20,76,56;
+	--avd-dark-background-sysinput:	20,20,28;
+	--avd-dark-background-sys:		0,0,0;
+	--avd-dark-custom-green:		34,192,99;
+
+	--orange:						250,101,51;
+	--tickblue:						48, 178,225;
+
+	--real-background-position:		right	6.6vh;
+	--real-background-size:			auto	73.4vh;
+	--avd-background-position:		right	6.6vh;
+	--avd-background-size:			auto	76.2vh;
+	--background-position:			var(--real-background-position);
+	--background-size:				var(--real-background-size);
+
+	--color:						var(--system-color);
+	--color-title:					var(--system-color-title);
+	--background-color:				var(--system-background-color);
+	--background-title:				var(--system-background-title);
+	--background-img:				var(--system-background-img);
+	--background-input:				var(--system-background-input);
+	--background-myinput:			var(--system-background-myinput);
+	--background-sysinput:			var(--system-background-sysinput);
+	--background-sys:				var(--system-background-sys);
+	--custom-green:					var(--system-custom-green);
+	--background-color-inv:			var(--system-background-color-inv);
+	--background-img-inv:			var(--system-background-img-inv);
+	
+	color:							rgba(var(--color),1);
+	background-color:				rgba(var(--background-color),1);
+}
+@media (prefers-color-scheme: light) {
+	body {
+		--system-color:					var(--light-color);
+		--system-color-title:			var(--light-color-title);
+		--system-background-color:		var(--light-background-color);
+		--system-background-title:		var(--light-background-title);
+		--system-background-img:		var(--light-background-img);
+		--system-background-input:		var(--light-background-input);
+		--system-background-myinput:	var(--light-background-myinput);
+		--system-background-sysinput:	var(--light-background-sysinput);
+		--system-background-sys:		var(--light-background-sys);
+		--system-custom-green:			var(--light-custom-green);
+		--system-background-color-inv:	var(--dark-background-color);
+		--system-background-img-inv:	var(--dark-background-img);
+	}
+}
+@media (prefers-color-scheme: dark) {
+	body {
+		--system-color:					var(--dark-color);
+		--system-color-title:			var(--dark-color-title);
+		--system-background-color:		var(--dark-background-color);
+		--system-background-title:		var(--dark-background-title);
+		--system-background-img:		var(--dark-background-img);
+		--system-background-input:		var(--dark-background-input);
+		--system-background-myinput:	var(--dark-background-myinput);
+		--system-background-sysinput:	var(--dark-background-sysinput);
+		--system-background-sys:		var(--dark-background-sys);
+		--system-custom-green:			var(--dark-custom-green);
+		--system-background-color-inv:	var(--light-background-color);
+		--system-background-img-inv:	var(--light-background-img);
+	}
+}
+.background-color {		background-color:		rgba(var(--background-color),1);}
+.background-color-inv {	background-color:		rgba(var(--background-color-inv),1);}
+.background-img {		background-image:		var(--background-img);
+						background-attachment:	fixed;
+						background-position:	var(--background-position);
+						background-size:		var(--background-size);
+}
+.background-img-inv {	background-image:		var(--background-img-inv);
+						background-attachment:	fixed;
+						background-position:	var(--background-position);
+						background-size:		var(--background-size);
+}

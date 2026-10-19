@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, viewport-fit=cover, initial-scale=1.0">
+	<title>WAStks</title>
+	<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+	<link rel="stylesheet" href="WATheme.css">
+	<link rel="stylesheet" href="WAStks.css?v=202609">
+</head>
+<body>
+<audio id=audioPlayer></audio>
+
+<div id=app-container class="background-color background-img">
+	<header id=topBar>
+		<span class="flex aligncenter">
+			<span id=clipBoardCard>
+				<span id=clipBoardPlaceholder>
+					<img width=40 src="assets/ghost_1f47b_Spuqui.webp" />
+				</span>
+				<input id=clipBoard type="text" title="Clipboard" class="toggled" onclick="callEmojiPicker('clipBoard')" size=1 />
+				<button id=cleanClipBoard class="emoji shadow" style="display:none;" title="Clean Clipboard" onclick="clearClipboard()">🧽</button>
+			</span>
+			<span class=chatTitle>
+				<span class=chatTitleTop>WAStks</span><br>
+				<span class=chatTitleBottom>Server, You</span>
+			</span>
+		</span>
+
+		<div id=emojis></div>
+		<div id=emojiCategs>
+			<button class="emoji icon" style="opacity:1;" title="Resets all categories" onclick="searchAll()">♻</button>
+			<button class="emoji cat icon" id="Smileys & Emotion" onclick="toggleCatFilter('Smileys & Emotion')" title="Smileys & Emotion">🙂‍↔️</button>
+			<button class="emoji cat icon" id="People & Body" onclick="toggleCatFilter('People & Body')" title="People & Body">🚶‍➡️</button>
+			<button class="emoji cat icon" id="Animals & Nature" onclick="toggleCatFilter('Animals & Nature')" title="Animals & Nature">🐦‍🔥</button>
+			<button class="emoji cat icon" id="Food & Drink" onclick="toggleCatFilter('Food & Drink')" title="Food & Drink">🍋‍🟩</button>
+			<button class="emoji cat icon" id="Travel & Places" onclick="toggleCatFilter('Travel & Places')" title="Travel & Places">🧭</button>
+			<button class="emoji cat icon" id="Activities" onclick="toggleCatFilter('Activities')" title="Activities">🎱</button>
+			<button class="emoji cat icon" id="Objects" onclick="toggleCatFilter('Objects')" title="Objects">⛓️‍💥</button>
+			<button class="emoji cat icon" id="Symbols" onclick="toggleCatFilter('Symbols')" title="Symbols">🔞</button>
+			<button class="emoji cat icon" id="Flags" onclick="toggleCatFilter('Flags')" title="Flags">🇧🇷</button>
+		</div>
+
+		<span class="flex column">
+			<button class="topBarSmallButton" title="Refresh" onclick="window.location.reload(true);">♻</button>
+			<button id=themePickerTog class="topBarSmallButton" title="Theme" onclick="toggle('themePicker');">💡</button>
+		</span>
+		<div id=themePicker class="softhide">
+			<button class="system" title="(default)" onclick="themeSet('system')">System</button>
+			<button class="dark" onclick="themeSet('dark')">Dark</button>
+			<button class="avddark" onclick="themeSet('avddark')">Dark (AVD)</button>
+			<button class="light" onclick="themeSet('light')">Light</button>
+			<button class="avdlight" onclick="themeSet('avdlight')">Light (AVD)</button>
+		</div>
+		<span id=showProgress class="softhide">
+			<span id=progressBar></span>
+			<span id=progressContainer>66.67%</span>
+		</span>
+		<div id=emojiDetails></div>
+	</header>
+
+    <main id=view-pager>
+		<section id=ownerLoginPage class="page">
+			<div id=owner-login></div>
+		</section>
+
+		<section id=serverChatPage class="page">
+			<div id=imgseq></div>
+			<div id=serverChat></div>
+			<div id=camera-container style="display:none;">
+				<video id=video playsinline></video>
+				<canvas id=canvas hidden></canvas>
+			</div>
+		</section>
+
+		<section id=workshopPage class="page" ondrop="dropHandlerWorkshop(event);" ondragover="dragOverHandler(event);">
+			<div id=workshop></div>
+		</section>
+		
+		<div id=languageMenu class="softhide">
+			<button title="English" onclick="setLanguageEnglish()">English 🇺🇸</button>
+			<button title="Portuguese" onclick="setLanguagePortuguese()">Português 🇧🇷</button>
+			<button title="Spanish" onclick="setLanguageSpanish()">Español 🇪🇸</button>
+		</div>
+    </main>
+	
+	<div id=clientChatBar>
+		<div id=clientChatInput>
+			<button id=stickerMenu title="Stickers Menu" onclick="toggleStickers();"><img width="32px" src="assets/sticker-icon.png"></button>
+			<input id=searchInput type="search" placeholder="Search" size=40 autocomplete="off"></input>
+			<button id=language title="Language" onclick="toggleLanguage()">🇺🇸</button>
+			<button id=docsMenu title="Media Menu" disabled onclick=""><img width="32px" src="assets/attachment-icon.png"></button>
+			<button id=cameraTog title="Scan QR code" onclick="toggleScanner()"><img width="32px" src="assets/camera-icon.png"></button>
+		</div>
+		<button id=sendBtn class="wa-green-bg" onclick="sendMessage()">▷</button>
+	</div>
+	
+	<div id=stickers style="display:block;">
+		<div id=stickerMenu>
+			<button id=stickerSearchTog class="topBarSmallButton" title="Search Stickers" onclick="toggleSearch();">🔍</button>
+			<input type=text id=stickerPackName title="Package Name"></input>
+			<span class="flex aligncenter" style="gap:1vh;">
+				<span id=visibleStickersCount>0</span><span title="Visible Stickers" class=icon>👀</span>
+			</span>
+			<span class="flex aligncenter" style="gap:1vh;">
+				<span id=allStickersCount>0</span>
+				<button title="Clear All Folder Filters" class="topBarSmallButton" onclick="toggleFolderFilter('')">💯</button>
+				<button id=stickersSource title="Home Collection" class="topBarSmallButton" onclick="toggleCollections()">🏠</button>
+			</span>
+			<button title="Refresh Stickers" class="topBarSmallButton" onclick="refreshStickers()">♻</button>
+		</div>
+
+		<div id=allStickers></div>
+		<div id=allFolders></div>
+	</div>
+	
+	<div id=workshopOverlay>
+		<div id=signForm></div>
+		<div id=collections class="hide"></div>
+	</div>
+	
+</div>
+<script src="WAStks.js?v=202610"></script>
+<script src="jsQR.js"></script>
+</body></html>
