@@ -12,6 +12,12 @@ echo Installing requirements...
 if ! dpkg -s php-apache >/dev/null 2>&1; then
 	pkg install -y php-apache
 fi
+if ! dpkg -s zrok >/dev/null 2>&1; then
+	pkg install -y zrok
+fi
+if ! dpkg -s libwebp >/dev/null 2>&1; then
+	pkg install -y libwebp
+fi
 echo Configuring Apache for WAStks...
 if [ ! -f "$PREFIX/etc/apache2/httpd-original.conf" ]; then
 	echo - Creating backup of original httpd.conf file...
