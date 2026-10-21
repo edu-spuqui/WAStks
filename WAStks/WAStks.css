@@ -553,6 +553,12 @@ a:visited { 		color:				rgba(var(--custom-green), 1); }
 			}
 			
 }
+.workshopEmojis .signemojiinput {
+					background: rgba(var(--custom-green), 0.5);
+}
+.workshopEmojis .signemojiinput.toggled {
+					background: rgba(var(--custom-green), 1);
+}
 .workshopActions {		display:			flex;
 					flex-direction:		column;
 					align-items:		center;
@@ -1110,7 +1116,9 @@ a:visited { 		color:				rgba(var(--custom-green), 1); }
 						margin:			0.5vh;
 					}
 }
-#stickerPackName {	font-size:			1.6vh;}
+#stickerPackName {	font-size:			1.6vh;
+					max-width:			30vw;
+}
 #visibleStickersCount {font-size:		2.5vh;
 					font-family:		custom;
 					color:				rgba(var(--color-title),1);
@@ -1434,7 +1442,6 @@ a:visited { 		color:				rgba(var(--custom-green), 1); }
 }
 .signEmojis .signemojiinput {	/* Standard dashed state + FORCE NOTO FONT */
     border: 0.2vh dashed rgba(var(--custom-green), 0.5);
-    background: rgba(var(--background-sysinput), 1);
     caret-color: transparent;
     outline: none;
     font-family: custom !important;	/* Forces NotoColorEmoji */

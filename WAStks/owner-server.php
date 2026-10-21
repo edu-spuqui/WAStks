@@ -401,7 +401,7 @@ echo'<div id=owner-server-content>';
 			echo'<button onclick="post(\'Prepare\', \'StickerPacks\')"><span class="mediumButton">📦</span> <span align=left>Prepare Sticker Packs</span></button><br>';
 			$androidMediaBase = '/storage/emulated/0/Android/media';
 			if (is_dir($androidMediaBase)) {
-				echo'Download <a href="https://spuquipcwastks.share.zrok.io/wastks_v5.apk" download="wastks_v5.apk">WAStks_v5.APK</a><br>';
+				echo'Download <a href="https://spuquipcwastks.share.zrok.io/wastks_v6.apk" download="wastks_v6.apk">WAStks_v6.APK</a><br>';
 			}
 		echo'</div>';
 	echo'</div>';
@@ -416,29 +416,29 @@ echo'<div id=owner-server-content>';
 	if ($cwebpVersion)								echo '👍 WebP Encoder version: '.$cwebpVersion.'<br>';
 	else {
 		echo '⚠ WebP Encoder: missing<br>';
-		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install libwebp'));
+		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install -y libwebp'));
 	}
 	$webpinfoVersion = shell_exec('webpinfo -version');
 	if ($webpinfoVersion)							echo '👍 '.$webpinfoVersion.'<br>';
 	else {
 		echo '⚠ WebP Decoder: missing<br>';
-		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install libwebp'));
+		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install -y libwebp'));
 	}
 	$webpmuxVersion = shell_exec('webpmux -version');
 	if ($webpmuxVersion)							echo '👍 WebP Muxer version: '.$webpmuxVersion.'<br>';
 	else {
 		echo '⚠ WebP Muxer: missing<br>';
-		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install libwebp'));
+		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install -y libwebp'));
 	}
 	$exiftoolVersion = shell_exec('exiftool -ver');
 	if ($exiftoolVersion)							echo '👍 ExifTool version: '.$exiftoolVersion.'<br>';
 	else {
 		echo '⚠ ExifTool: missing<br>';
-		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install exiftool'));
+		if (php_uname('s') != 'Windows NT')			echo(shell_exec('pkg install -y exiftool'));
 	}
 	if (file_exists('assets/NotoColorEmoji.ttf'))	echo '👍 Font NotoColorEmoji.ttf<br>';
 	else {
-		$fontData = file_get_contents('https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf');
+		$fontData = file_get_contents('https://github.com/googlefonts/noto-emoji/raw/main/2D/fonts/NotoColorEmoji.ttf');
 		if ($fontData !== false) file_put_contents('assets/NotoColorEmoji.ttf', $fontData);
 		if (file_exists('assets/NotoColorEmoji.ttf'))	echo '👍 Font NotoColorEmoji.ttf<br>';
 		else											echo '⚠ Font NotoColorEmoji.ttf missing<br>';

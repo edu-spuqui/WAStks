@@ -102,55 +102,7 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 		if (isset($sticker['FrameCount']))	echo '<input id="'.$i.'FrameCount" type="hidden" value="'.$sticker['FrameCount'].'" />';
 
 		echo'<div style="width:100%;" class="flex space-between">';
-			echo PHP_EOL.'<div id=workshop'.$i.'webpactions class=workshopActions>';
-			{	// Workshop Actions
-
-				if (isset($sticker['source'])) {
-					echo '<input type=hidden id="'.$sticker['filename'].'source" value="'.$sticker['source'].'">'.PHP_EOL;
-					if (file_exists('Favorites/'.$sticker['filename'].'.fav'))	echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Remove from Favorites">❤</button>';
-					else														echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Add to Favorites" style="opacity:0.33;">❤</button>';
-				}
-				echo '<button title="Unlink '.$sticker['filename'].'" onclick="post(\'Unlink\', \''.$sticker['filename'].'\')" class="emoji">⛓️‍💥</button>'.PHP_EOL;
-				if (isset($sticker['source'])) {
-					if (!str_starts_with($sticker['source'], 'WA-Media'))
-						echo '<button onclick="post(\'Update\', \''.$sticker['filename'].'\')" title="Update Source">💾</button>';
-				}
-				echo '<button title="ToggleSign '.$sticker['filename'].'" onclick="toggleSignature(\''.$sticker['filename'].'\')">✒</button>';
-				
-				echo '<button title="Create Tray Icon" onclick="post(\'CreateTrayIcon\', \''.$sticker['filename'].'\')">🦄</button>';
-				
-				/*
-				$adbAvailable = command_exists('adb');
-				if ($adbAvailable) {
-					echo '<button title="TogglePhone '.$sticker['filename'].'" onclick="togglePhone(\''.$sticker['filename'].'\')">📱</button>';
-				}
-				*/
-				
-				if ($sticker['TotalDuration'] > 0) echo '<button title="Disassemble '.$sticker['filename'].'" onclick="post(\'Disassemble\', \''.$sticker['filename'].'\')" class="emoji">⬅</button>';
-
-			}
-			echo'</div>';
-
 			echo'<div style="width:calc(100% - 4.4vh);" class="flexcolumn">';
-				echo '<div class=workshopFilename>';
-					// Filename
-					echo'<span>'.$sticker['filename'].'</span>';
-					// Index / Count
-					echo'<span>'.($i+1).'/'.$stickerscount.' </span>'.PHP_EOL;
-				echo'</div>';
-
-				echo PHP_EOL.'<div class=bothbgs>';
-					echo'<div class="background-color">';
-						echo'<img title="'.$sticker['filename'].'" id=workshop'.$i.'img src="'.$sticker['dirname'].'/'.$sticker['filename'].'.webp'.'">';
-					echo'</div>';
-					echo'<div class="background-color-inv">';
-						if (isset($sticker['source']))
-							echo'<img title="Source file over Opposite Background" id=workshop'.$i.'obg src="'.$sticker['source'].'">';
-						else
-							echo'<img title="'.$sticker['filename'].'" src="'.$sticker['dirname'].'/'.$sticker['filename'].'.webp'.'">';
-					echo'</div>';
-				echo'</div>';
-				
 				echo'<div class=workshopEmojis>';
 					echo'<span style="gap:0.6vh;">';
 					$unofficial = false;
@@ -183,16 +135,64 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 					echo'</span>';
 
 					echo'<span>';
-					if (!empty($sticker['emojis'][0]))	{ echo'<input onclick="callEmojiPicker(\''.$i.'_emoji1\')" id="'.$i.'_emoji1" type="text" size=1 autocomplete=off class="signemojiinput" value="'.$sticker['emojis'][0].'" />';	}
-					else								{ echo'<input onclick="callEmojiPicker(\''.$i.'_emoji1\')" id="'.$i.'_emoji1" type="text" size=1 autocomplete=off class="signemojiinput" value="" />';							}
-					if (!empty($sticker['emojis'][1]))	{ echo'<input onclick="callEmojiPicker(\''.$i.'_emoji2\')" id="'.$i.'_emoji2" type="text" size=1 autocomplete=off class="signemojiinput" value="'.$sticker['emojis'][1].'" />';	}
-					else								{ echo'<input onclick="callEmojiPicker(\''.$i.'_emoji2\')" id="'.$i.'_emoji2" type="text" size=1 autocomplete=off class="signemojiinput" value="" />';							}
-					if (!empty($sticker['emojis'][2]))	{ echo'<input onclick="callEmojiPicker(\''.$i.'_emoji3\')" id="'.$i.'_emoji3" type="text" size=1 autocomplete=off class="signemojiinput" value="'.$sticker['emojis'][2].'" />';	}
-					else								{ echo'<input onclick="callEmojiPicker(\''.$i.'_emoji3\')" id="'.$i.'_emoji3" type="text" size=1 autocomplete=off class="signemojiinput" value="" />';							}
+					if (!empty($sticker['emojis'][0]))	{ echo'<button onclick="callEmojiPicker(\''.$i.'_emoji1\')" id="'.$i.'_emoji1" type="text" size=1 autocomplete=off class="signemojiinput">'.$sticker['emojis'][0].'</button>';	}
+					else								{ echo'<button onclick="callEmojiPicker(\''.$i.'_emoji1\')" id="'.$i.'_emoji1" type="text" size=1 autocomplete=off class="signemojiinput"></button>';							}
+					if (!empty($sticker['emojis'][1]))	{ echo'<button onclick="callEmojiPicker(\''.$i.'_emoji2\')" id="'.$i.'_emoji2" type="text" size=1 autocomplete=off class="signemojiinput">'.$sticker['emojis'][1].'</button>';	}
+					else								{ echo'<button onclick="callEmojiPicker(\''.$i.'_emoji2\')" id="'.$i.'_emoji2" type="text" size=1 autocomplete=off class="signemojiinput"></button>';							}
+					if (!empty($sticker['emojis'][2]))	{ echo'<button onclick="callEmojiPicker(\''.$i.'_emoji3\')" id="'.$i.'_emoji3" type="text" size=1 autocomplete=off class="signemojiinput">'.$sticker['emojis'][2].'</button>';	}
+					else								{ echo'<button onclick="callEmojiPicker(\''.$i.'_emoji3\')" id="'.$i.'_emoji3" type="text" size=1 autocomplete=off class="signemojiinput"></button>';							}
 					echo'<button title="Save Emojis" onclick="post(\'SaveEmojis\', \''.$sticker['filename'].'\')" class="signemoji">💾</button>';
 					echo'</span>';
 				echo'</div>';
+
+				echo PHP_EOL.'<div class=bothbgs>';
+					echo'<div class="background-color">';
+						echo'<img title="'.$sticker['filename'].'" id=workshop'.$i.'img src="'.$sticker['dirname'].'/'.$sticker['filename'].'.webp'.'">';
+					echo'</div>';
+					echo'<div class="background-color-inv">';
+						if (isset($sticker['source']))
+							echo'<img title="Source file over Opposite Background" id=workshop'.$i.'obg src="'.$sticker['source'].'">';
+						else
+							echo'<img title="'.$sticker['filename'].'" src="'.$sticker['dirname'].'/'.$sticker['filename'].'.webp'.'">';
+					echo'</div>';
+				echo'</div>';
+				
+				echo '<div class=workshopFilename>';
+					// Filename
+					echo'<span>'.$sticker['filename'].'</span>';
+					// Index / Count
+					echo'<span>'.($i+1).'/'.$stickerscount.' </span>'.PHP_EOL;
+				echo'</div>';
 			echo'</div>';
+			echo PHP_EOL.'<div id=workshop'.$i.'webpactions class=workshopActions>';
+			{	// Workshop Actions
+
+				if (isset($sticker['source'])) {
+					echo '<input type=hidden id="'.$sticker['filename'].'source" value="'.$sticker['source'].'">'.PHP_EOL;
+					if (file_exists('Favorites/'.$sticker['filename'].'.fav'))	echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Remove from Favorites">❤</button>';
+					else														echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Add to Favorites" style="opacity:0.33;">❤</button>';
+				}
+				echo '<button title="Unlink '.$sticker['filename'].'" onclick="post(\'Unlink\', \''.$sticker['filename'].'\')" class="emoji">⛓️‍💥</button>'.PHP_EOL;
+				if (isset($sticker['source'])) {
+					if (!str_starts_with($sticker['source'], 'WA-Media'))
+						echo '<button onclick="post(\'Update\', \''.$sticker['filename'].'\')" title="Update Source">💾</button>';
+				}
+				echo '<button title="ToggleSign '.$sticker['filename'].'" onclick="toggleSignature(\''.$sticker['filename'].'\')">✒</button>';
+				
+				echo '<button title="Create Tray Icon" onclick="post(\'CreateTrayIcon\', \''.$sticker['filename'].'\')">🦄</button>';
+				
+				/*
+				$adbAvailable = command_exists('adb');
+				if ($adbAvailable) {
+					echo '<button title="TogglePhone '.$sticker['filename'].'" onclick="togglePhone(\''.$sticker['filename'].'\')">📱</button>';
+				}
+				*/
+				
+				if ($sticker['TotalDuration'] > 0) echo '<button title="Disassemble '.$sticker['filename'].'" onclick="post(\'Disassemble\', \''.$sticker['filename'].'\')" class="emoji">⬅</button>';
+
+			}
+			echo'</div>';
+
 		echo'</div>';
 	echo'</div>'.PHP_EOL;
 }
@@ -232,7 +232,7 @@ if (count($workshopStickers)>0) {
 } else { echo'<div id=workshop-content class="hide"></div>'; }
 echo'<div id=workshop-title class="server-title">';
 	echo'<span><span class=shadow>🔧</span> Workshop</span>';
-		echo'<span class="flex row" style="gap:1.5vh;">';
+		echo'<span class="flex row" style="gap:0.5vh;">';
 			if (count($workshopStickers)>0) {
 				echo'<input type="text" id=PackageName value="'.date("Y-m").'" autocomplete="off" />';
 				echo'<button id=packageworkshop class="emoji" title="Move Into Package" onclick="post(\'MoveIntoPackage\', document.getElementById(\'PackageName\').value)">📦</button>';

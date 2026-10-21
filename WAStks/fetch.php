@@ -1186,6 +1186,12 @@ echo'<div id=serverChat>';
 				$src = pathinfo($source);
 				$folder = $src['dirname'];
 				if (rename('Workshop/_tray.png', $folder.'/_tray.png')) {
+					$image_data_versionFile = $folder.'/image_data_version.txt';
+					if (file_exists($image_data_versionFile)) {
+						$image_data_version = file_get_contents($image_data_versionFile);
+						$image_data_version++;
+						file_put_contents($image_data_versionFile, $image_data_version);
+					}
 					serverMsg('Tray icon moved to package '.$folder, $_POST['reqID']);
 				}
 			}

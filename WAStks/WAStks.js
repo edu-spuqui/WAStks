@@ -281,9 +281,9 @@ async function preparePost(data, command, reference, reqID) {
 		const emoji2 = document.getElementById(i+'_emoji2');
 		const emoji3 = document.getElementById(i+'_emoji3');
 		
-		if (emoji1)	data.append('emoji1', emoji1.value);
-		if (emoji2)	data.append('emoji2', emoji2.value);
-		if (emoji3)	data.append('emoji3', emoji3.value);
+		if (emoji1)	data.append('emoji1', emoji1.innerText);
+		if (emoji2)	data.append('emoji2', emoji2.innerText);
+		if (emoji3)	data.append('emoji3', emoji3.innerText);
 
 	}
 	else if (command=='Refresh') { if (reference=='Manifest') goToPage('serverChatPage'); }
@@ -419,8 +419,8 @@ async function postSuccessful(parsedResponse, command, reference, reqID) {
 	}
 	else if (command=='LinkRemote') {
 		await updateDiv(parsedResponse, 'workshop');
-		const PackageNameInput = document.getElementById(PackageName);
-		const stickerPackName = document.getElementById(stickerPackName);
+		const PackageNameInput = document.getElementById('PackageName');
+		const stickerPackName = document.getElementById('stickerPackName');
 		if (stickerPackName.value) PackageNameInput.value = stickerPackName.value;
 		document.getElementById('workshopPage').scrollIntoView({ behavior: 'smooth' });
 		const basename = reference.split('/').pop();
@@ -1425,11 +1425,12 @@ function emojicopy(text) {
 		}
 	}
 	if (caller) {
-		caller.value = text;
 		if (caller == clipBoard) {
 			clipBoard.value = text;
 			if (!clipBoardPlaceholder.classList.contains('softhide')) clipBoardPlaceholder.classList.add('softhide');
 			navigator.clipboard.writeText(text);
+		} else {
+			caller.innerText = text;
 		}
 	}
 	else {
@@ -1452,7 +1453,7 @@ function callEmojiPicker(callerID) {
 			//		document.getElementById('stickers').style.display='none';
 			//	}
 			//}
-			searchInput.focus();
+			//searchInput.focus();
 			previouscaller = caller;
 		}
 		else {
