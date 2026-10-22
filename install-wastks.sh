@@ -29,6 +29,7 @@ if [ -f "termux-httpd.conf" ]; then
 fi
 if [ -f "termux-php.ini" ]; then
 	echo - Adding php.ini config file...
+	mkdir -p $PREFIX/etc/php
 	mv -f termux-php.ini $PREFIX/etc/php/php.ini
 fi
 if [ ! -e "$HOME/WAStks/.owner" ]; then
@@ -36,7 +37,7 @@ if [ ! -e "$HOME/WAStks/.owner" ]; then
 fi
 if [ ! -e "$HOME/WAStks/WA-Media" ]; then
 	echo Creating SymLink for WhatsApp Media folder...
-	ln -s /storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media ~/WAStks/WA-Media
+	ln -s /storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media ~/wastks/WAStks/WA-Media
 fi
 echo Setting Apache to run as a service...
 sv-enable httpd
