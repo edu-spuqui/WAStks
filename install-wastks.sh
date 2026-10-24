@@ -1,10 +1,14 @@
 #!/bin/bash
 if ! dpkg -s termux-services >/dev/null 2>&1; then
-	bash prepare-wastks.sh
+	bash ~/wastks/prepare-wastks.sh
 	if [ $? -ne 0 ]; then
 		exit 1
 	fi
 fi
+[ -d ~/storage ] || termux-setup-storage
+chmod +x ~/wastks/*.sh
+grep -qxF "cd ~/wastks" ~/.bashrc 2>/dev/null || echo "cd ~/wastks" >> ~/.bashrc
+pkg update -y && pkg upgrade -y -o Dpkg::Options::="--force-confold"
 echo =========================================
 echo       WAStks installation starting
 echo =========================================
@@ -25,17 +29,17 @@ if [ ! -f "$PREFIX/etc/apache2/httpd-original.conf" ]; then
 fi
 if [ -f "termux-httpd.conf" ]; then
 	echo - Updating httpd.conf file with WAStks version...
-	mv -f termux-httpd.conf $PREFIX/etc/apache2/httpd.conf
+	mv -f ~/wastks/termux-httpd.conf $PREFIX/etc/apache2/httpd.conf
 fi
 if [ -f "termux-php.ini" ]; then
 	echo - Adding php.ini config file...
 	mkdir -p $PREFIX/etc/php
-	mv -f termux-php.ini $PREFIX/etc/php/php.ini
+	mv -f ~/wastks/termux-php.ini $PREFIX/etc/php/php.ini
 fi
-if [ ! -e "$HOME/WAStks/.owner" ]; then
-	bash config-wastks.sh
+if [ ! -e "$HOME/wastks/WAStks/.owner" ]; then
+	bash ~/wastks/config-wastks.sh
 fi
-if [ ! -e "$HOME/WAStks/WA-Media" ]; then
+if [ ! -e "$HOME/wastks/WAStks/WA-Media" ]; then
 	echo Creating SymLink for WhatsApp Media folder...
 	ln -s /storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media ~/wastks/WAStks/WA-Media
 fi
@@ -48,4 +52,4 @@ echo      WAStks installation complete
 echo =========================================
 echo Launching WAStks...
 sleep 2
-bash launch-wastks.sh
+bash ~/wastks/launch-wastks.sh
