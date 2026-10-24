@@ -27,11 +27,11 @@ if [ ! -f "$PREFIX/etc/apache2/httpd-original.conf" ]; then
 	echo - Creating backup of original httpd.conf file...
 	mv -f $PREFIX/etc/apache2/httpd.conf $PREFIX/etc/apache2/httpd-original.conf
 fi
-if [ -f "termux-httpd.conf" ]; then
+if [ -f "$HOME/wastks/termux-httpd.conf" ]; then
 	echo - Updating httpd.conf file with WAStks version...
 	mv -f ~/wastks/termux-httpd.conf $PREFIX/etc/apache2/httpd.conf
 fi
-if [ -f "termux-php.ini" ]; then
+if [ -f "$HOME/wastks/termux-php.ini" ]; then
 	echo - Adding php.ini config file...
 	mkdir -p $PREFIX/etc/php
 	mv -f ~/wastks/termux-php.ini $PREFIX/etc/php/php.ini
