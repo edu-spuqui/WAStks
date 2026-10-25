@@ -1,33 +1,24 @@
 <div style="line-height:1.5;margin:1vh;">
-How to install WAStks tool on Android:<br>
+Get the <a href="https://play.google.com/store/apps/details?id=app.spuqui.wastks" target="_blank">WAStks</a> Android app from <a href="https://play.google.com/store/apps" target="_blank">Google Play Store</a>.<br>
+<br>
+How to install the WAStks tool on Android:<br>
 <ul>
-<li>Get the <a href="https://f-droid.org/en/packages/com.termux/">Termux</a> app from <a href="https://f-droid.org/">F-Droid</a>, NOT from <a href="https://play.google.com/store/games?hl=en">Playstore</a>.</li>
+<li>Get the <a href="https://play.google.com/store/apps/details?id=com.termux" target="_blank">Termux</a> app from <a href="https://play.google.com/store/apps" target="_blank">Google Play Store</a>.</li>
 <li>Install it, open it, run commands:
 	<ul>
-		<li>(optional) <a class="commands" onclick="navigator.clipboard.writeText('termux-change-repo')">termux-change-repo</a> (choose a closer/faster mirror)</li>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('pkg install git')">pkg install git</a></li>
+		<li><a class="commands" onclick="navigator.clipboard.writeText('pkg install -y git')">pkg install -y git</a></li>
 <!--
 		<li><a class="commands" onclick="navigator.clipboard.writeText('zrok copy https://wastkslatest.share.zrok.io .')">zrok copy https://wastkslatest.share.zrok.io .</a></li>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('git clone https://github.com/edu-spuqui/WAStks.git .')">git clone https://github.com/edu-spuqui/WAStks.git .</a></li>
 -->
-		<li><a class="commands" onclick="navigator.clipboard.writeText('git init')">git init</a></li>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('git remote add origin https://github.com/edu-spuqui/WAStks.git')">git remote add origin https://github.com/edu-spuqui/WAStks.git</a></li>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('git fetch origin')">git fetch origin</a></li>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('git checkout -t origin/main')">git checkout -t origin/main</a></li>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('bash prepare-wastks.sh')">bash prepare-wastks.sh</a></li>
+		<li><a class="commands" onclick="navigator.clipboard.writeText('git clone https://github.com/edu-spuqui/WAStks.git ~/wastks')">git clone https://github.com/edu-spuqui/WAStks.git ~/wastks</a></li>
+		<li><a class="commands" onclick="navigator.clipboard.writeText('bash ~/wastks/install-wastks.sh')">bash ~/wastks/install-wastks.sh</a></li>
 	</ul>
 </li>
-<li>Restart Termux to apply changes, run:</li>
-	<ul>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('bash install-wastks.sh')">bash install-wastks.sh</a></li>
-	</ul>
-<li>Download the Android app from Play Store (<a href="https://play.google.com/apps/internaltest/4700497090870791735">internal testing</a>), or directly from here: <a href="https://spuquipcwastks.share.zrok.io/wastks_v6.apk" download="wastks_v6.apk">WAStks_v6.APK</a> and install it.</li>
 </ul>
 Extra installation steps if you want to share your stickers on the internet:<br>
 <ul>
 	<li>On Termux, run commands:</li>
 	<ul>
-		<li><a class="commands" onclick="navigator.clipboard.writeText('pkg install zrok')">pkg install zrok</a></li>
 		<li><a class="commands" onclick="navigator.clipboard.writeText('zrok invite')">zrok invite</a></li> (this will open another window where you will have to type your e-mail address twice to send it the invitation)
 	</ul>
 	<li>Check your e-mail, find the message "Welcome to zrok!", open it, click the "Create Account" button.</li>

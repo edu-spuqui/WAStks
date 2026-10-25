@@ -429,13 +429,13 @@ async function postSuccessful(parsedResponse, command, reference, reqID) {
 		const stkcardEmojis = stkcard.querySelectorAll('button.emoji');
 		// console.log(stkcardEmojis);
 		const workshopcard = document.querySelector(`div.workshopCard[data-filename="${filename}"]`);
-		const wscardEmojis = workshopcard.querySelectorAll('input.signemojiinput');
+		const wscardEmojis = workshopcard.querySelectorAll('button.signemojiinput');
 		let emojisUpdated = false;
 		// console.log(wscardEmojis);
 		if (stkcardEmojis.length && wscardEmojis.length) {
 			stkcardEmojis.forEach((btn, index) => {
-				if (wscardEmojis[index].value == "") {
-					wscardEmojis[index].value = btn.innerText.trim();
+				if (wscardEmojis[index].innerText == "") {
+					wscardEmojis[index].innerText = btn.innerText.trim();
 					emojisUpdated = true;
 					console.log('Updated emoji value of '+wscardEmojis[index].id);
 				}
@@ -938,17 +938,18 @@ async function buildStickersFromManifest() {
 			stickersSource.innerText = '🌐';
 			stickersSource.title = 'WAN Collection: '+collection;
 		}
-    } else {
+    }
+	else {
 		const protocol = window.location.protocol;
 		const host = window.location.hostname;
         const port = window.location.port;
         const isOwner = getCookie('owner_auth');
 		if (isOwner) {
 			const privateVisibility = getCookie('privateVisibility');
-			if (privateVisibility=='show')
-				manifestUrl = `${protocol}//${host}:${port}/owner-manifest.json?v=${Date.now()}`;
-			else
+			if (privateVisibility=='hide')
 				manifestUrl = `${protocol}//${host}:${port}/manifest.json?v=${Date.now()}`;
+			else
+				manifestUrl = `${protocol}//${host}:${port}/owner-manifest.json?v=${Date.now()}`;
 		} else {
 			manifestUrl = `${protocol}//${host}:${port}/manifest.json?v=${Date.now()}`;
 		}
@@ -2396,8 +2397,7 @@ window.onload = async function() {
 		console.log(getTimestamp() + ' Welcome to Spuqui\'s WAStks!');
 		document.getElementById('view-pager').focus();
 		document.getElementById('serverChatPage').scrollIntoView({ behavior: 'smooth' });
-		if (window.innerHeight > window.innerWidth)
-			fullServerMsg('For instructions on how to install the WAStks tool on an Android device, swipe right and hide stickers or just <button onclick="howtoinstall();">click here</button>.','');
+		fullServerMsg('For instructions on how to install the WAStks tool on an Android device, swipe right and hide stickers or just <button onclick="howtoinstall();">click here</button>.','');
 	}
 	
 	adjustDynamicHeight();

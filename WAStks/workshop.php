@@ -1,5 +1,27 @@
 <?php
 
+function command_exists($cmd) {
+    if (php_uname('s') == 'Windows NT') {
+        // Windows 'where' is usually more reliable than 'command'
+        $test = shell_exec("where $cmd 2>NUL");
+    } else {
+        // Linux/Termux builtin
+        $test = shell_exec("command -v $cmd 2>/dev/null");
+    }
+    return !empty($test);
+}
+
+$isRootedDeviceAvailable = false;
+if (command_exists('adb')) {
+	$rootTestString = shell_exec('adb shell "su -c \"ls -la /data/data\""');
+	if ($rootTestString) {
+		$rootTest = explode("\n",$rootTestString);
+		if (count($rootTest)>2) {
+			$isRootedDeviceAvailable = true;
+		}
+	}
+}
+
 function getWorkshopStickerInfo($pathfilename) {
 	unset($stk);
 	$stk = pathinfo($pathfilename);
@@ -181,12 +203,10 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 				
 				echo '<button title="Create Tray Icon" onclick="post(\'CreateTrayIcon\', \''.$sticker['filename'].'\')">🦄</button>';
 				
-				/*
-				$adbAvailable = command_exists('adb');
-				if ($adbAvailable) {
+				global $isRootedDeviceAvailable;
+				if ($isRootedDeviceAvailable) {
 					echo '<button title="TogglePhone '.$sticker['filename'].'" onclick="togglePhone(\''.$sticker['filename'].'\')">📱</button>';
 				}
-				*/
 				
 				if ($sticker['TotalDuration'] > 0) echo '<button title="Disassemble '.$sticker['filename'].'" onclick="post(\'Disassemble\', \''.$sticker['filename'].'\')" class="emoji">⬅</button>';
 
@@ -195,16 +215,6 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 
 		echo'</div>';
 	echo'</div>'.PHP_EOL;
-}
-function command_exists($cmd) {
-    if (php_uname('s') == 'Windows NT') {
-        // Windows 'where' is usually more reliable than 'command'
-        $test = shell_exec("where $cmd 2>NUL");
-    } else {
-        // Linux/Termux builtin
-        $test = shell_exec("command -v $cmd 2>/dev/null");
-    }
-    return !empty($test);
 }
 
 //unset($sourceStickers);

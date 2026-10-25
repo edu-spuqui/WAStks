@@ -381,12 +381,12 @@ function renderPhoneForm($filename) {
 	$wasp='/data/data/com.whatsapp/files/Stickers/';
 	$ando='/storage/emulated/0/Download/';
 
-	$lastSticker = trim(basename(shell_exec('adb -s emulator-5554 shell "su -c ls -crt /data/data/com.whatsapp/files/Stickers/*.webp | tail -n 1"')));
+	$lastSticker = trim(basename(shell_exec('adb shell "su -c ls -crt /data/data/com.whatsapp/files/Stickers/*.webp | tail -n 1"')));
 	if ($lastSticker) {
-		$copy = shell_exec('adb -s emulator-5554 shell "su -c cp -v -f '.$wasp.$lastSticker.' '.$ando.$lastSticker.'"');
+		$copy = shell_exec('adb shell "su -c cp -v -f '.$wasp.$lastSticker.' '.$ando.$lastSticker.'"');
 		if (str_starts_with($copy,'cp ')) {
-			shell_exec('adb -s emulator-5554 pull '.$ando.$lastSticker.' Temp/'.$lastSticker);
-			shell_exec('adb -s emulator-5554 shell "su -c rm '.$ando.$lastSticker.'"');
+			shell_exec('adb pull '.$ando.$lastSticker.' Temp/'.$lastSticker);
+			shell_exec('adb shell "su -c rm '.$ando.$lastSticker.'"');
 			copy('Temp/'.$lastSticker, 'Temp/lastSticker.webp');
 			unlink('Temp/'.$lastSticker);
 		}
@@ -404,32 +404,6 @@ function renderPhoneForm($filename) {
 			echo '<img title="Last Sticker Unavailable" src="Temp/lastSticker.webp?v='.time().'">';
 		echo '</div>';
 	}
-}
-function copyNewSticker($filename) {
-    $workshopPath = 'Workshop/'.$filename.'.webp';
-    $srcFile  = 'Workshop/'.$filename.'.src';
-    
-    if (!file_exists($srcFile)) {
-		$destDir = 'WA-Media/WhatsApp Stickers';
-		$destPath = $destDir.'/'.$filename.'.webp';
-
-		// If filename exists in target, user chose NOT to overwrite, so we version it
-		if (file_exists($destPath)) {
-			$count = 1;
-			while (file_exists($destDir.'/'.$filename.'_'.$count.'.webp')) {
-				$count++;
-			}
-			$destPath = $destDir.'/'.$filename.'_'.$count.'.webp';
-			$filename = $filename.'_'.$count; // Update for the serverMsg
-		}
-
-		if (copy($workshopPath, $destPath)) {
-			serverMsg($filename.' was copied to "WA-Media/WhatsApp Stickers" folder.', '');
-			return true;
-		}
-    }
-
-    return false;
 }
 function serverMsg($msg,$reqID) {
 	if ($reqID)	echo '<div class="serverMsgDiv" id="'.$reqID.'">';
@@ -1148,22 +1122,21 @@ echo'<div id=serverChat>';
 			$ando='/storage/emulated/0/Download/';
 			
 			// file_put_contents('debug.txt', "Received: " . $_POST['lastSticker'] . PHP_EOL, FILE_APPEND);
-			$push = 'adb -s emulator-5554 push "Workshop/' . $filename . '.webp" "' . $ando . $lastSticker . '"';
+			$push = 'adb push "Workshop/' . $filename . '.webp" "' . $ando . $lastSticker . '"';
 			$pushResult = shell_exec($push);
 			// serverMsg('Push:'.$push.'<br>Result:'.$pushResult, '');
-			$move = 'adb -s emulator-5554 shell su -c "mv -v -f \"'.$ando.$lastSticker.'\" \"'.$wasp.$lastSticker.'\""';
+			$move = 'adb shell su -c "mv -v -f \"'.$ando.$lastSticker.'\" \"'.$wasp.$lastSticker.'\""';
 			$moveResult = shell_exec($move);
 			// serverMsg('Move:'.$move.'<br>Result:'.$moveResult, '');
 			if (str_starts_with($moveResult,'mv ')) {
-				$chmod = 'adb -s emulator-5554 shell su -c "chmod a+r \"'.$wasp.$lastSticker.'\""';
+				$chmod = 'adb shell su -c "chmod a+r \"'.$wasp.$lastSticker.'\""';
 				$chmodResult = shell_exec($chmod);
 				if (!empty($chmodResult)) replyDown('Issue updating file permissions: '.$chmodResult, $_POST['reqID']);
 				else {
 					replyUp('Sticker updated on phone.', $_POST['reqID']);
-					copyNewSticker($filename);
 				}
 			} else {
-				// shell_exec('adb -s emulator-5554 shell su -c rm '.$ando.$lastSticker);
+				// shell_exec('adb shell su -c rm '.$ando.$lastSticker);
 				replyDown('Failed to update Sticker on phone: '.$moveResult, $_POST['reqID']);
 			}
 			
@@ -1350,7 +1323,7 @@ echo'<div id=serverChat>';
 		}	
 		if (isset($_POST['Update'])) {
 			if ($_POST['Update']=="Server") {
-				$command = "zrok copy --sync https://wastkslatest.share.zrok.io .. 2>&1";
+				$command = "zrok copy --sync https://wastkslatest.share.zrok.io ~/wastks 2>&1";
 
 				$output = shell_exec($command);
 				
@@ -1414,6 +1387,8 @@ echo'<div id=serverChat>';
 					if ($publisher=="👻") {
 						$package[$i]['publisher_email']="edu.spuqui@gmail.com";
 						$package[$i]['publisher_website']="https://www.youtube.com/@SpuquiWAStickers";
+						$package[$i]['privacy_policy_website']="https://edu-spuqui.github.io/WAStks/privacy-policy.html";
+						$package[$i]['license_agreement_website']="";
 					}
 					$package[$i]['animated_sticker_pack']=true;
 					$package[$i]['stickers']=array();
@@ -1444,8 +1419,8 @@ echo'<div id=serverChat>';
 							if ($meta[$stkfilename]['compliance']) {
 								$package[$i]['stickers'][] = array(
 									'image_file' => $stkbasename,
-									'accessibility_text' => $stkfilename.' in '.$folder,
-									'emojis' => $emojis
+									'emojis' => $emojis,
+									'accessibility_text' => $stkfilename.' in '.$folder
 								);
 							} else {
 								serverMsg($folder."/".$stkbasename." excluded due to non-compliance: ".$meta[$stkfilename]['noncompliancereason'], "");
@@ -1454,8 +1429,8 @@ echo'<div id=serverChat>';
 							if (checkStickerCompliance($stk)) {
 								$package[$i]['stickers'][] = array(
 									'image_file' => $stkbasename,
-									'accessibility_text' => $stkfilename.' in '.$folder,
-									'emojis' => $emojis
+									'emojis' => $emojis,
+									'accessibility_text' => $stkfilename.' in '.$folder
 								);
 							} else {
 								$stkinfo = getStickerInfo($stk);
@@ -1473,6 +1448,7 @@ echo'<div id=serverChat>';
 			$androidMediaBase = '/storage/emulated/0/Android/media';
 			if (isset($package)) {
 				$output=array();
+				$output['android_play_store_link']="https://play.google.com/store/apps/details?id=app.spuqui.wastks";
 				$output['sticker_packs']=$package;
 				$outputJSON = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 				if ($f=fopen('Packs/contents.json', 'w')) {
@@ -1538,6 +1514,8 @@ echo'<div id=serverChat>';
 					if ($publisher=="👻") {
 						$package[$i]['publisher_email']="edu.spuqui@gmail.com";
 						$package[$i]['publisher_website']="https://www.youtube.com/@SpuquiWAStickers";
+						$package[$i]['privacy_policy_website']="https://edu-spuqui.github.io/WAStks/privacy-policy.html";
+						$package[$i]['license_agreement_website']="";
 					}
 					$package[$i]['animated_sticker_pack']=true;
 					$package[$i]['stickers']=array();
@@ -1568,8 +1546,8 @@ echo'<div id=serverChat>';
 							if ($meta[$stkfilename]['compliance']) {
 								$package[$i]['stickers'][] = array(
 									'image_file' => $stkbasename,
-									'accessibility_text' => $stkfilename.' in '.$folder,
-									'emojis' => $emojis
+									'emojis' => $emojis,
+									'accessibility_text' => $stkfilename.' in '.$folder
 								);
 							} else {
 								serverMsg($folder."/".$stkbasename." excluded due to non-compliance: ".$meta[$stkfilename]['noncompliancereason'], "");
@@ -1578,8 +1556,8 @@ echo'<div id=serverChat>';
 							if (checkStickerCompliance($stk)) {
 								$package[$i]['stickers'][] = array(
 									'image_file' => $stkbasename,
-									'accessibility_text' => $stkfilename.' in '.$folder,
-									'emojis' => $emojis
+									'emojis' => $emojis,
+									'accessibility_text' => $stkfilename.' in '.$folder
 								);
 							} else {
 								$stkinfo = getStickerInfo($stk);
@@ -1598,6 +1576,7 @@ echo'<div id=serverChat>';
 			$androidMediaBase = '/storage/emulated/0/Android/media';
 			if (isset($package)) {
 				$output=array();
+				$output['android_play_store_link']="https://play.google.com/store/apps/details?id=app.spuqui.wastks";
 				$output['sticker_packs']=$package;
 				$outputJSON = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 

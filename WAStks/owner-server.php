@@ -1,8 +1,7 @@
 <?php
 
 echo'<div id=owner-server-content>';
-
-	if (!is_dir('Favorites'))	mkdir('Favorites', 0777);
+	if (!is_dir('Favorites'))	mkdir('Favorites', 0777, true);
 	if (!is_dir('Packs'))		mkdir('Packs', 0777);
 	if (!is_dir('PrivatePacks'))mkdir('PrivatePacks', 0777);
 	if (!is_dir('Workshop'))	mkdir('Workshop', 0777);
@@ -387,25 +386,25 @@ echo'<div id=owner-server-content>';
 			echo'Public: <span id=localPublicStickersCount>'.count($publicStickers).'</span> stks<br>';
 			echo'Private: ';
 			if ($privateVisibility == 'hide')
-				echo'<input type="radio" name="privatevisibility" value="hide" checked><label for="hide">hide</label>';
+				echo'<input type="radio" style="font-size:calc(0.9vh + 1.1vmin);" name="privatevisibility" id="privhide" value="hide" checked><label for="privhide">hide</label>';
 			else 
-				echo'<input type="radio" name="privatevisibility" value="hide"><label for="hide">hide</label>';
+				echo'<input type="radio" style="font-size:calc(0.9vh + 1.1vmin);" name="privatevisibility" id="privhide" value="hide"><label for="privhide">hide</label>';
 			if ($privateVisibility == 'show')
-				echo'<input type="radio" name="privatevisibility" value="show" checked><label for="show">show</label>';
+				echo'<input type="radio" style="font-size:calc(0.9vh + 1.1vmin);" name="privatevisibility" id="privshow" value="show" checked><label for="privshow">show</label>';
 			else
-				echo'<input type="radio" name="privatevisibility" value="show"><label for="show">show</label>';
+				echo'<input type="radio" style="font-size:calc(0.9vh + 1.1vmin);" name="privatevisibility" id="privshow" value="show"><label for="privshow">show</label>';
 			echo'<button onclick="savePrivateVisibility()" title="Save Private Visibility">💾</button><br>';
 			echo'<div style="width:100%;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:1.5vmin;display:block;">Owner Name:</span><input id="ownerName" type="text" style="max-width:12ch;" value="'.$ownerName.'" /><button onclick="post(\'Save\',\'OwnerName\')" title="Save Owner Name">💾</button></div>';
 			echo'<div style="width:100%;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:1.5vmin;display:block;">Device Name:</span><input id="deviceName" type="text" style="max-width:12ch;" value="'.$deviceName.'" /><button onclick="post(\'Save\',\'DeviceName\')" title="Save Device Name">💾</button></div>';
 			echo'<div style="width:100%;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:1.5vmin;display:block;">Pack Publisher:</span><input id="publisher" type="text" style="max-width:11ch;" value="'.$publisher.'" /><button onclick="post(\'Save\',\'Publisher\')" title="Save Publisher">💾</button></div>';
-			echo'<button onclick="post(\'Prepare\', \'StickerPacks\')"><span class="mediumButton">📦</span> <span align=left>Prepare Sticker Packs</span></button><br>';
 			$androidMediaBase = '/storage/emulated/0/Android/media';
 			if (is_dir($androidMediaBase)) {
-				echo'Download <a href="https://spuquipcwastks.share.zrok.io/wastks_v6.apk" download="wastks_v6.apk">WAStks_v6.APK</a><br>';
+				echo'<br>Get the <a href="https://play.google.com/store/apps/details?id=app.spuqui.wastks" target="_blank">WAStks</a> Android app from <a href="https://play.google.com/store/apps" target="_blank">Google Play Store</a>.<br>';
 			}
 		echo'</div>';
 	echo'</div>';
 	echo'<br>';
+	echo'<button onclick="post(\'Prepare\', \'StickerPacks\')"><span class="mediumButton">📦</span> <span align=left>Prepare Sticker Packs</span></button><br>';
 	echo'<button onclick="post(\'Clean\', \'Favorites\')"><span class="mediumButton">🧼</span> <span align=left>Clean Favorites</span></button><br>';
 	echo'<button onclick="indexMetadata()"><span class="mediumButton">📇</span> <span align=left>Index Metadata</span></button><br>';
 	echo'<button onclick="post(\'Update\', \'Server\')"><span class="mediumButton">🔄</span> <span align=left>Update WAStks Server</span></button><br>';
