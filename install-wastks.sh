@@ -5,9 +5,9 @@ if ! dpkg -s termux-services >/dev/null 2>&1; then
 		exit 1
 	fi
 fi
-[ -d ~/storage ] || termux-setup-storage
 chmod +x ~/wastks/*.sh
 grep -qxF "cd ~/wastks" ~/.bashrc 2>/dev/null || echo "cd ~/wastks" >> ~/.bashrc
+[ -d ~/storage ] || termux-setup-storage
 pkg update -y && pkg upgrade -y -o Dpkg::Options::="--force-confold"
 echo =========================================
 echo       WAStks installation starting
@@ -21,6 +21,9 @@ if ! dpkg -s zrok >/dev/null 2>&1; then
 fi
 if ! dpkg -s libwebp >/dev/null 2>&1; then
 	pkg install -y libwebp
+fi
+if ! dpkg -s exiftool >/dev/null 2>&1; then
+	pkg install -y exiftool
 fi
 echo Configuring Apache for WAStks...
 if [ ! -f "$PREFIX/etc/apache2/httpd-original.conf" ]; then
