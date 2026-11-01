@@ -2,13 +2,13 @@
 
 echo'<div id=owner-server-content>';
 	if (!is_dir('Favorites'))	mkdir('Favorites', 0777, true);
-	if (!is_dir('Packs'))		mkdir('Packs', 0777);
-	if (!is_dir('PrivatePacks'))mkdir('PrivatePacks', 0777);
-	if (!is_dir('Workshop'))	mkdir('Workshop', 0777);
+	if (!is_dir('packs'))		mkdir('packs', 0777);
+	if (!is_dir('privatepacks'))mkdir('privatepacks', 0777);
+	if (!is_dir('workshop'))	mkdir('workshop', 0777);
 	if (!is_dir('Logs'))		mkdir('Logs', 0777);
-	if (!is_dir('Temp'))		mkdir('Temp', 0777);
-	if (!is_dir('Temp/png'))	mkdir('Temp/png', 0777);
-	if (!is_dir('Temp/webp'))	mkdir('Temp/webp', 0777);
+	if (!is_dir('temp'))		mkdir('temp', 0777);
+	if (!is_dir('temp/png'))	mkdir('temp/png', 0777);
+	if (!is_dir('temp/webp'))	mkdir('temp/webp', 0777);
 
 	if (php_uname('s') == 'Windows NT')		$foldsep = "\\";
 	else									$foldsep = "/";
@@ -42,26 +42,24 @@ echo'<div id=owner-server-content>';
 
 	function getAllFolders() {
 		if (is_dir('Favorites')) $allFolders['Favorites'] = count(glob('Favorites/*.fav'));
-		if (is_dir('Packs')) {
-			$stickerPacks = glob("Packs/*", GLOB_ONLYDIR);
+		if (is_dir('packs')) {
+			$stickerPacks = glob("packs/*", GLOB_ONLYDIR);
 			if ($stickerPacks) {
-				$allFolders['Packs'] = count($stickerPacks);
+				$allFolders['packs'] = count($stickerPacks);
 				rsort($stickerPacks);
 				foreach($stickerPacks as $first) {
 					$count = count(glob($first.'/*.webp'));
-					if (file_exists($first.'/_tray.webp')) $count--;
 					$allFolders[$first] = $count;
 				}
 			}
 		}
-		if (is_dir('PrivatePacks')) {
-			$stickerPacks = glob("PrivatePacks/*", GLOB_ONLYDIR);
+		if (is_dir('privatepacks')) {
+			$stickerPacks = glob("privatepacks/*", GLOB_ONLYDIR);
 			if ($stickerPacks) {
-				$allFolders['PrivatePacks'] = count($stickerPacks);
+				$allFolders['privatepacks'] = count($stickerPacks);
 				rsort($stickerPacks);
 				foreach($stickerPacks as $first) {
 					$count = count(glob($first.'/*.webp'));
-					if (file_exists($first.'/_tray.webp')) $count--;
 					$allFolders[$first] = $count;
 				}
 			}
@@ -101,10 +99,10 @@ echo'<div id=owner-server-content>';
 			foreach($allFolders as $folder => $count) {
 				$folderStickers = glob($folder.'/*.webp');
 				if ($folderStickers) {
-					if (str_starts_with($folder,'Packs')) {
+					if (str_starts_with($folder,'packs')) {
 						// sort by modified date descending
 						usort($folderStickers,'mdate_desc');
-					} else if (str_starts_with($folder,'PrivatePacks')) {
+					} else if (str_starts_with($folder,'privatepacks')) {
 						// sort by modified date descending
 						usort($folderStickers,'mdate_desc');
 					} else if (str_starts_with($folder,'WA-Media/WhatsApp Stickers/')) {
@@ -262,14 +260,14 @@ echo'<div id=owner-server-content>';
 
 		foreach($allFolders as $folderpath => $count) {
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'Private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
 				$publicFolders[$folderpath] = $count;
 			}
 		}
 		foreach($allStickers as $stk) {
 			$folderpath = $stk['dirname'];
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'Private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
 				$publicStickers[] = $stk;
 			}
 		}
@@ -307,14 +305,14 @@ echo'<div id=owner-server-content>';
 
 		foreach($allFolders as $folderpath => $count) {
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'Private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
 				$publicFolders[$folderpath] = $count;
 			}
 		}
 		foreach($allStickers as $stk) {
 			$folderpath = $stk['dirname'];
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'Private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
 				$publicStickers[] = $stk;
 			}
 		}
@@ -351,6 +349,26 @@ echo'<div id=owner-server-content>';
 		}
 	}
 
+	echo'<table width="100%">';
+	echo'<tr>';
+	echo'<td>';
+	echo'<button onclick="post(\'Update\', \'Server\')"><span class="mediumButton">🔄</span> <span align=left>Update WAStks Server</span></button><br>';
+	echo'</td>';
+	echo'<td>';
+	echo'<button onclick="post(\'Prepare\', \'StickerPacks\')"><span class="mediumButton">📦</span> <span align=left>Prepare Sticker Packs</span></button><br>';
+	echo'</td>';
+	echo'</tr>';
+	echo'<tr>';
+	echo'<td>';
+	echo'<button onclick="indexMetadata()"><span class="mediumButton">📇</span> <span align=left>Index Metadata</span></button><br>';
+	echo'</td>';
+	echo'<td>';
+	echo'<button onclick="post(\'Clean\', \'Favorites\')"><span class="mediumButton">🧼</span> <span align=left>Clean Favorites</span></button><br>';
+	echo'</td>';
+	echo'</tr>';
+	echo'</table>';
+	// echo'<button onclick="post(\'Refresh\', \'Manifest\')"><span class="mediumButton">♻</span> <span align=left>Refresh Manifest</span></button><br>';
+
 	echo'<div class="flex row space-evenly">';
 		$zrokAlias = $ownerName.$deviceName.'WAStks';
 		$zrokalias = strtolower($zrokAlias);
@@ -381,7 +399,6 @@ echo'<div id=owner-server-content>';
 				echo'<button onclick="post(\'zrokShare\',\''.$zrokalias.'\')"><span class="mediumButton"><span class="subicon">▶</span>🌐</span> <span align=left>zrok share</span></button><br>';
 			}
 			echo $zrokalias.' ('.$zrokState.')<br>';
-			// echo'<button onclick="post(\'Refresh\', \'Manifest\')"><span class="mediumButton"><img src="assets/wastk.webp"></span> <span align=left>Refresh Manifest</span></button>';
 			echo'Total: <span id=localAllStickersCount>'.count($allStickers).'</span> stks<br>';
 			echo'Public: <span id=localPublicStickersCount>'.count($publicStickers).'</span> stks<br>';
 			echo'Private: ';
@@ -403,11 +420,6 @@ echo'<div id=owner-server-content>';
 			}
 		echo'</div>';
 	echo'</div>';
-	echo'<br>';
-	echo'<button onclick="post(\'Prepare\', \'StickerPacks\')"><span class="mediumButton">📦</span> <span align=left>Prepare Sticker Packs</span></button><br>';
-	echo'<button onclick="post(\'Clean\', \'Favorites\')"><span class="mediumButton">🧼</span> <span align=left>Clean Favorites</span></button><br>';
-	echo'<button onclick="indexMetadata()"><span class="mediumButton">📇</span> <span align=left>Index Metadata</span></button><br>';
-	echo'<button onclick="post(\'Update\', \'Server\')"><span class="mediumButton">🔄</span> <span align=left>Update WAStks Server</span></button><br>';
 	echo '<br>=== Checking requirements ===<br>';
 	if (phpversion()) 								echo '👍 PHP(v'.phpversion().') webserver<br>';
 	else											echo '⚠ PHP(missing) webserver<br>';

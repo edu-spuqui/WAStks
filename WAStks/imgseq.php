@@ -1,6 +1,6 @@
 <?php
-$pngFiles = glob('Temp/png/*.png');
-$webpFiles = glob('Temp/webp/*.webp');
+$pngFiles = glob('temp/png/*.png');
+$webpFiles = glob('temp/webp/*.webp');
 
 {	// ImgSeq page
 	if ( count($pngFiles) || count($webpFiles) ) {
@@ -30,7 +30,7 @@ $webpFiles = glob('Temp/webp/*.webp');
 						{
 							// Single Numeric Digit
 							$candidateSeq = substr($shortname, 0,-1);
-							$candidateSeqFiles = glob('Temp/png/'.$candidateSeq.'?.png');
+							$candidateSeqFiles = glob('temp/png/'.$candidateSeq.'?.png');
 							if (count($candidateSeqFiles)==1)
 								$indexlength = 0;
 							else if (count($candidateSeqFiles)<=10)
@@ -42,7 +42,7 @@ $webpFiles = glob('Temp/webp/*.webp');
 							{
 								// 2 numeric digits in the end
 								$candidateSeq = substr($shortname, 0,-2);
-								$candidateSeqFiles = glob('Temp/png/'.$candidateSeq.'??.png');
+								$candidateSeqFiles = glob('temp/png/'.$candidateSeq.'??.png');
 								if (count($candidateSeqFiles)==1)
 									$indexlength = 0;
 								else if (count($candidateSeqFiles)<=10)
@@ -54,12 +54,12 @@ $webpFiles = glob('Temp/webp/*.webp');
 								// at least 3 numeric digits
 								
 								$candidateSeq = substr($shortname, 0,-3);
-								$candidateSeqFiles = glob('Temp/png/'.$candidateSeq.'0??.png');
+								$candidateSeqFiles = glob('temp/png/'.$candidateSeq.'0??.png');
 								if (count($candidateSeqFiles)>98) {
 									$indexlength = 3;
 								} else {
 									$candidateSeq = substr($shortname, 0,-2);
-									$candidateSeqFiles = glob('Temp/png/'.$candidateSeq.'0?.png');
+									$candidateSeqFiles = glob('temp/png/'.$candidateSeq.'0?.png');
 									if (count($candidateSeqFiles)==10)
 										$indexlength = 2;
 									else 
@@ -104,7 +104,7 @@ $webpFiles = glob('Temp/webp/*.webp');
 						if (!is_numeric(substr($shortname,-2)))
 						{	// Single Numeric Digit
 							$candidateSeq = substr($shortname, 0,-1);
-							$candidateSeqFiles = glob('Temp/webp/'.$candidateSeq.'?.webp');
+							$candidateSeqFiles = glob('temp/webp/'.$candidateSeq.'?.webp');
 							if (count($candidateSeqFiles)==1)
 								$indexlength = 0;
 							else if (count($candidateSeqFiles)<=10)
@@ -116,7 +116,7 @@ $webpFiles = glob('Temp/webp/*.webp');
 							{
 								// 2 numeric digits in the end
 								$candidateSeq = substr($shortname, 0,-2);
-								$candidateSeqFiles = glob('Temp/webp/'.$candidateSeq.'??.webp');
+								$candidateSeqFiles = glob('temp/webp/'.$candidateSeq.'??.webp');
 								if (count($candidateSeqFiles)==1)
 									$indexlength = 0;
 								else if (count($candidateSeqFiles)<=10)
@@ -128,12 +128,12 @@ $webpFiles = glob('Temp/webp/*.webp');
 								// at least 3 numeric digits
 								
 								$candidateSeq = substr($shortname, 0,-3);
-								$candidateSeqFiles = glob('Temp/webp/'.$candidateSeq.'0??.webp');
+								$candidateSeqFiles = glob('temp/webp/'.$candidateSeq.'0??.webp');
 								if (count($candidateSeqFiles)>98) {
 									$indexlength = 3;
 								} else {
 									$candidateSeq = substr($shortname, 0,-2);
-									$candidateSeqFiles = glob('Temp/webp/'.$candidateSeq.'0?.webp');
+									$candidateSeqFiles = glob('temp/webp/'.$candidateSeq.'0?.webp');
 									if ((count($candidateSeqFiles)==10)||(count($candidateSeqFiles)==9))
 										$indexlength = 2;
 									else 
@@ -189,19 +189,19 @@ $webpFiles = glob('Temp/webp/*.webp');
 							// Image Count
 							if (isset($Sequences[$sequence]['indexlength'])) {
 								if ($Sequences[$sequence]['indexlength']==0) {
-									$Seq['pngcount'] = count(glob('Temp/png/'.$sequence.'.png'));
+									$Seq['pngcount'] = count(glob('temp/png/'.$sequence.'.png'));
 								}
 								else if ($Sequences[$sequence]['indexlength']==1) {
-									$Seq['pngcount'] = count(glob('Temp/png/'.$sequence.'?.png'));
-									$Seq['webpcount'] = count(glob('Temp/webp/'.$sequence.'?.webp'));
+									$Seq['pngcount'] = count(glob('temp/png/'.$sequence.'?.png'));
+									$Seq['webpcount'] = count(glob('temp/webp/'.$sequence.'?.webp'));
 								}
 								else if ($Sequences[$sequence]['indexlength']==2) {
-									$Seq['pngcount'] = count(glob('Temp/png/'.$sequence.'??.png'));
-									$Seq['webpcount'] = count(glob('Temp/webp/'.$sequence.'??.webp'));
+									$Seq['pngcount'] = count(glob('temp/png/'.$sequence.'??.png'));
+									$Seq['webpcount'] = count(glob('temp/webp/'.$sequence.'??.webp'));
 								}
 								else if ($Sequences[$sequence]['indexlength']==3) {
-									$Seq['pngcount'] = count(glob('Temp/png/'.$sequence.'???.png'));
-									$Seq['webpcount'] = count(glob('Temp/webp/'.$sequence.'???.webp'));
+									$Seq['pngcount'] = count(glob('temp/png/'.$sequence.'???.png'));
+									$Seq['webpcount'] = count(glob('temp/webp/'.$sequence.'???.webp'));
 								}
 							}
 							if (isset($Sequences[$sequence]['pngsize'])) {
@@ -237,9 +237,9 @@ $webpFiles = glob('Temp/webp/*.webp');
 								echo'<label style="cursor:pointer;" for="first'.$i.'">';
 							}
 							if (isset($Sequences[$sequence]['pngfirst'])) {
-								echo '<img title="First" class=imgseqimg src="Temp/png/'.$sequence.$Sequences[$sequence]['pngfirst'].'.png">';
+								echo '<img title="First" class=imgseqimg src="temp/png/'.$sequence.$Sequences[$sequence]['pngfirst'].'.png">';
 							} else if (isset($Sequences[$sequence]['webpfirst'])) {
-								echo '<img title="First" class=imgseqimg src="Temp/webp/'.$sequence.$Sequences[$sequence]['webpfirst'].'.webp">';
+								echo '<img title="First" class=imgseqimg src="temp/webp/'.$sequence.$Sequences[$sequence]['webpfirst'].'.webp">';
 							}
 							if (isset($Sequences[$sequence]['webpsize'])) {echo'</label>'.PHP_EOL;}
 						echo'</div>';
@@ -263,9 +263,9 @@ $webpFiles = glob('Temp/webp/*.webp');
 								echo'<label style="cursor:pointer;" for="last'.$i.'">';
 							}
 							if (isset($Sequences[$sequence]['pnglast'])) {
-								echo '<img title="Last" class=imgseqimg src="Temp/png/'.$sequence.$Sequences[$sequence]['pnglast'].'.png">';
+								echo '<img title="Last" class=imgseqimg src="temp/png/'.$sequence.$Sequences[$sequence]['pnglast'].'.png">';
 							} else if (isset($Sequences[$sequence]['webplast'])) {
-								echo '<img title="Last" class=imgseqimg src="Temp/webp/'.$sequence.$Sequences[$sequence]['webplast'].'.webp">';
+								echo '<img title="Last" class=imgseqimg src="temp/webp/'.$sequence.$Sequences[$sequence]['webplast'].'.webp">';
 							}
 							if (isset($Sequences[$sequence]['webpsize'])) {echo'</label>'.PHP_EOL;}
 						}

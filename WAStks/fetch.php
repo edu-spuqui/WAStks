@@ -37,7 +37,7 @@ if (isset($_GET['get_file'])) {
     $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
     // Security: Allow Stickers or Audio directories
-    $allowed = (strpos($filePath, 'WA-Media/') === 0 || strpos($filePath, 'User-Media/') === 0 || strpos($filePath, 'Packs/') === 0 || strpos($filePath, 'PrivatePacks/') === 0);
+    $allowed = (strpos($filePath, 'WA-Media/') === 0 || strpos($filePath, 'User-Media/') === 0 || strpos($filePath, 'packs/') === 0 || strpos($filePath, 'privatepacks/') === 0);
 
     if ($allowed && file_exists($filePath)) {
         // Map extensions to correct Mime Types
@@ -276,8 +276,8 @@ function buildStickerInfo($sticker) {
 	echo '</div>'.PHP_EOL;
 }
 function renderExifForm($filename) {
-    $path = 'Workshop/'.$filename.'.webp';
-	$srcPath = 'Workshop/'.$filename.'.src';
+    $path = 'workshop/'.$filename.'.webp';
+	$srcPath = 'workshop/'.$filename.'.src';
 	$pubPath = '.owner/publisher.txt';
 	
 	$originPath = file_exists($srcPath) ? trim(file_get_contents($srcPath)) : '';
@@ -392,14 +392,14 @@ function renderPhoneForm($filename) {
 		}
 		echo '<div id="phone-form">';
 			echo '<input type="hidden" id="PhoneFor" value="'.$filename.'">';
-			echo '<img src="Workshop/'.$filename.'.webp">';
+			echo '<img src="workshop/'.$filename.'.webp">';
 			echo '<button title="Update Phone\'s Last Sticker" class="topBarButton" onclick="updateLastSticker(\''.$filename.'\', \''.$lastSticker.'\')">📲</button>';
 			echo '<img title="Last Sticker" src="Temp/lastSticker.webp?v='.time().'">';
 		echo '</div>';
 	} else {
 		echo '<div id="phone-form">';
 			echo '<input type="hidden" id="PhoneFor" value="'.$filename.'">';
-			echo '<img title="Workshop Sticker" src="Workshop/'.$filename.'.webp">';
+			echo '<img title="Workshop Sticker" src="workshop/'.$filename.'.webp">';
 			echo '<button disabled title="DISABLED - Update Phone\'s Last Sticker" class="topBarButton" onclick="">📲</button>';
 			echo '<img title="Last Sticker Unavailable" src="Temp/lastSticker.webp?v='.time().'">';
 		echo '</div>';
@@ -476,15 +476,15 @@ echo'<div id=serverChat>';
 			$source = $_POST['Link'];
 			$src = pathinfo($source);
 			if (file_exists($source)) {
-				$copyresult = copy($source, 'Workshop/'.$src['filename'].'.webp');
+				$copyresult = copy($source, 'workshop/'.$src['filename'].'.webp');
 				if ($copyresult) {
 					replyUp('Linked '.$src['filename'],$_POST['reqID']);
-					// touch('Workshop/'.$filename.'.webp', filemtime($source), fileatime($source));
+					// touch('workshop/'.$filename.'.webp', filemtime($source), fileatime($source));
 					$audioFile = $src['dirname'].'/'.$src['filename'].'.aac';
 					if (file_exists($audioFile)) {
-						copy($audioFile, 'Workshop/'.$src['filename'].'.aac');
+						copy($audioFile, 'workshop/'.$src['filename'].'.aac');
 					}
-					file_put_contents('Workshop/'.$src['filename'].'.src',$source);
+					file_put_contents('workshop/'.$src['filename'].'.src',$source);
 				} else
 					replyDown('Failed to link '.$source,$_POST['reqID']);
 			} else {
@@ -500,7 +500,7 @@ echo'<div id=serverChat>';
 			$filename = basename($urlPath, '.webp');
 
 			if (isset($_FILES['sticker_blob'])) {
-				$destPath = "Workshop/" . $basename;
+				$destPath = "workshop/" . $basename;
 				
 				if (move_uploaded_file($_FILES['sticker_blob']['tmp_name'], $destPath)) {
 					$msg = "Linked $basename";
@@ -508,7 +508,7 @@ echo'<div id=serverChat>';
 					// Check for the accompanying audio blob
 					if (isset($_FILES['audio_blob'])) {
 						$audioBasename = $filename.'.aac';
-						$audioDest = "Workshop/" . $audioBasename;
+						$audioDest = "workshop/" . $audioBasename;
 
 						if (move_uploaded_file($_FILES['audio_blob']['tmp_name'], $audioDest)) {
 							$msg .= " (with audio $audioBasename)";
@@ -526,7 +526,7 @@ echo'<div id=serverChat>';
 		}
 		if (isset($_POST['Clear'])) {
 			if ($_POST['Clear']=='Workshop') {
-				$workshop_files = glob('Workshop/*.*');
+				$workshop_files = glob('workshop/*.*');
 				$count = 0;
 				foreach ($workshop_files as $victim) {
 					if (unlink($victim)) {
@@ -657,9 +657,9 @@ echo'<div id=serverChat>';
 							if (isset($candidate['audioFile'])) $audioFileSize = filesize($candidate['audioFile']);
 							
 							if (!str_starts_with($candidate['dirname'],'WA-Media')) {
-								if (str_starts_with($candidate['dirname'],'Packs/')) {
+								if (str_starts_with($candidate['dirname'],'packs/')) {
 									$dirname = substr($candidate['dirname'], 6);
-								} else if (str_starts_with($candidate['dirname'],'PrivatePacks/')) {
+								} else if (str_starts_with($candidate['dirname'],'privatepacks/')) {
 									$dirname = substr($candidate['dirname'], 13);
 								} else if (str_starts_with($candidate['dirname'],'User-Media/Stickers/')) {
 									$dirname = substr($candidate['dirname'], 20);
@@ -740,12 +740,12 @@ echo'<div id=serverChat>';
 							$currIndex = "0".$currIndex;
 						}
 					}
-					shell_exec('webpmux -get frame '.$j.' "Workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$currIndex.'.webp"');
+					shell_exec('webpmux -get frame '.$j.' "workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$currIndex.'.webp"');
 				}
-				shell_exec('webpmux -get frame 1 "Workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$FrameCount.'.webp"');
+				shell_exec('webpmux -get frame 1 "workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$FrameCount.'.webp"');
 				$cmdout = 'Disassembled '.$filename.' into '.$FrameCount.' frames';
 			} else {
-				$webpinfoString = shell_exec('webpinfo "Workshop/'.$filename.'.webp"');
+				$webpinfoString = shell_exec('webpinfo "workshop/'.$filename.'.webp"');
 				$webpinfo = explode("\n", $webpinfoString);
 				unset($framemap);
 				$counter=0;
@@ -778,12 +778,12 @@ echo'<div id=serverChat>';
 							$currIndex = "0".$currIndex;
 						}
 					}
-					shell_exec('webpmux -get frame '.$j.' "Workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$currIndex.'.webp"');
+					shell_exec('webpmux -get frame '.$j.' "workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$currIndex.'.webp"');
 				}
 				$cmdout = 'Disassembled '.$filename.' into '.$FrameCount.' frames';
 				
 				if (isset($framemap)) {
-					$handle = fopen('Workshop/'.$filename.'_framemap.txt','w');
+					$handle = fopen('workshop/'.$filename.'_framemap.txt','w');
 					forEach ($framemap as $fields) {
 						if ($fields!='0+0+1'.PHP_EOL) {
 							fwrite($handle,$fields);
@@ -791,10 +791,10 @@ echo'<div id=serverChat>';
 					}
 					fclose($handle);
 
-					if (filesize('Workshop/'.$filename.'_framemap.txt')>0) {
+					if (filesize('workshop/'.$filename.'_framemap.txt')>0) {
 						$cmdout = 'Disassembled '.$filename.' into '.$FrameCount.' frames and saved framemap';
 					} else {
-						unlink('Workshop/'.$filename.'_framemap.txt');
+						unlink('workshop/'.$filename.'_framemap.txt');
 					}
 				}
 			}
@@ -804,11 +804,11 @@ echo'<div id=serverChat>';
 			echo'</div>';
 		}
 		if (isset($_POST['Unlink'])) {
-			if (unlink('Workshop/'.$_POST['Unlink'].'.webp')) {
+			if (unlink('workshop/'.$_POST['Unlink'].'.webp')) {
 				replyUp('Unlinked '.$_POST['Unlink'],$_POST['reqID']);
-				if (file_exists('Workshop/'.$_POST['Unlink'].'.aac')) unlink('Workshop/'.$_POST['Unlink'].'.aac');
-				if (file_exists('Workshop/'.$_POST['Unlink'].'.src')) unlink('Workshop/'.$_POST['Unlink'].'.src');
-				if (file_exists('Workshop/'.$_POST['Unlink'].'_framemap.txt')) unlink('Workshop/'.$_POST['Unlink'].'_framemap.txt');
+				if (file_exists('workshop/'.$_POST['Unlink'].'.aac')) unlink('workshop/'.$_POST['Unlink'].'.aac');
+				if (file_exists('workshop/'.$_POST['Unlink'].'.src')) unlink('workshop/'.$_POST['Unlink'].'.src');
+				if (file_exists('workshop/'.$_POST['Unlink'].'_framemap.txt')) unlink('workshop/'.$_POST['Unlink'].'_framemap.txt');
 			} else {
 				replyDown('Failed to unlink '.$_POST['Unlink'],$_POST['reqID']);
 			}
@@ -817,9 +817,9 @@ echo'<div id=serverChat>';
 			$filename = $_POST['ToggleFav'];
 			$source = $_POST['src'];
 			
-			if (str_starts_with($source,'Workshop')) {
-				if (file_exists('Workshop/'.$filename.'.src')) {
-					$SRC = file_get_contents('Workshop/'.$filename.'.src');
+			if (str_starts_with($source,'workshop')) {
+				if (file_exists('workshop/'.$filename.'.src')) {
+					$SRC = file_get_contents('workshop/'.$filename.'.src');
 					if ( str_starts_with($SRC,'phone') )
 						serverMsg('Phone files are temporary and should not be favorited', $_POST['reqID']);
 					else
@@ -895,7 +895,7 @@ echo'<div id=serverChat>';
 		}
 		if (isset($_POST['UpdateEXIF'])) {
 			$filename = $_POST['UpdateEXIF'];
-			$pathfilename = 'Workshop/'.$filename.'.webp';
+			$pathfilename = 'workshop/'.$filename.'.webp';
 
 			// 1. RE-READ the file fresh to preserve any data not in the form
 			$sticker = getStickerInfo($pathfilename);
@@ -983,7 +983,7 @@ echo'<div id=serverChat>';
 			if (count($SeqFiles)==1) {
 				// Static Sticker
 				$png = pathinfo($SeqFiles[0]);
-				$cmd = shell_exec('cwebp -q '.$Quality.' -alpha_q '.$Quality.' -m 6 -mt -quiet "Temp/png/'.$png['basename'].'" -o "Workshop/'.$png['filename'].'.webp"');
+				$cmd = shell_exec('cwebp -q '.$Quality.' -alpha_q '.$Quality.' -m 6 -mt -quiet "Temp/png/'.$png['basename'].'" -o "workshop/'.$png['filename'].'.webp"');
 				replyUp('Success!', $_POST['reqID'] ?? '');
 				serverMsg('Created Static Sticker '.$cmd, '');
 			} else {
@@ -1050,8 +1050,8 @@ echo'<div id=serverChat>';
 			$sync=$sync_every;
 			$frames2process = count($frames);
 
-			if (file_exists('Workshop/'.$sequence.'_framemap.txt')) {
-				$framemapstring = file_get_contents('Workshop/'.$sequence.'_framemap.txt');
+			if (file_exists('workshop/'.$sequence.'_framemap.txt')) {
+				$framemapstring = file_get_contents('workshop/'.$sequence.'_framemap.txt');
 				$framemap = explode("\n",$framemapstring);
 				unset($framemap[count($framemap)-1]);
 			}
@@ -1105,7 +1105,7 @@ echo'<div id=serverChat>';
 				}
 			}
 			
-			$fullmuxcmd = 'webpmux '.$muxcmd.' -o "Workshop'.$foldsep.$sequence.'.webp"';
+			$fullmuxcmd = 'webpmux '.$muxcmd.' -o "workshop'.$foldsep.$sequence.'.webp"';
 			shell_exec($fullmuxcmd);
 			$timestamp = date("j/m/Y H:i:s");
 			$logentry = $timestamp.';created;'.$FPS.';'.$FirstFrame.';'.$FirstFrameDuration.';';
@@ -1122,7 +1122,7 @@ echo'<div id=serverChat>';
 			$ando='/storage/emulated/0/Download/';
 			
 			// file_put_contents('debug.txt', "Received: " . $_POST['lastSticker'] . PHP_EOL, FILE_APPEND);
-			$push = 'adb push "Workshop/' . $filename . '.webp" "' . $ando . $lastSticker . '"';
+			$push = 'adb push "workshop/' . $filename . '.webp" "' . $ando . $lastSticker . '"';
 			$pushResult = shell_exec($push);
 			// serverMsg('Push:'.$push.'<br>Result:'.$pushResult, '');
 			$move = 'adb shell su -c "mv -v -f \"'.$ando.$lastSticker.'\" \"'.$wasp.$lastSticker.'\""';
@@ -1143,13 +1143,13 @@ echo'<div id=serverChat>';
 		}
 		if (isset($_POST['CreateTrayIcon'])) {
 			$filename = $_POST['CreateTrayIcon'];
-			$sourcePath = 'Workshop/'.$filename.'.src';
+			$sourcePath = 'workshop/'.$filename.'.src';
 			if (file_exists($sourcePath)) {
 				$source = trim(file_get_contents($sourcePath));
 			}
-			$trayPathTmp = 'Workshop/_tray.webp';
-			$trayPath = 'Workshop/_tray.png';
-			shell_exec("webpmux -get frame 1 \"Workshop/$filename.webp\" -o $trayPathTmp 2>&1");
+			$trayPathTmp = 'workshop/_tray.webp';
+			$trayPath = 'workshop/_tray.png';
+			shell_exec("webpmux -get frame 1 \"workshop/$filename.webp\" -o $trayPathTmp 2>&1");
 			$trayCreation = shell_exec("dwebp $trayPathTmp -resize 96 96 -o $trayPath 2>&1");
 			replyUp($trayCreation, $_POST['reqID']);
 			if (file_exists($trayPath)) {
@@ -1158,7 +1158,7 @@ echo'<div id=serverChat>';
 			if ($source) {
 				$src = pathinfo($source);
 				$folder = $src['dirname'];
-				if (rename('Workshop/_tray.png', $folder.'/_tray.png')) {
+				if (rename('workshop/_tray.png', $folder.'/_tray.png')) {
 					$image_data_versionFile = $folder.'/image_data_version.txt';
 					if (file_exists($image_data_versionFile)) {
 						$image_data_version = file_get_contents($image_data_versionFile);
@@ -1171,7 +1171,7 @@ echo'<div id=serverChat>';
 		}
 		if (isset($_POST['MoveIntoPackage'])) {
 			$packName = $_POST['MoveIntoPackage'] ?? '';
-			$stickers = glob('Workshop/*.webp');
+			$stickers = glob('workshop/*.webp');
 			// sort by modified date ascending
 			usort($stickers,'mdate_asc');
 			
@@ -1180,7 +1180,7 @@ echo'<div id=serverChat>';
 				$packName == date("Y-m");
 			}
 			
-			$targetDir = 'Packs/'.$packName;
+			$targetDir = 'packs/'.$packName;
 			if (!is_dir($targetDir)) mkdir($targetDir);
 
 			// Move .webp files and sanitize Workshop
@@ -1194,29 +1194,29 @@ echo'<div id=serverChat>';
 					if (file_exists($audfile)) $audioFile = $audfile;
 					$audfilesent = 'WA-Media/WhatsApp Audio/Sent/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 					if (file_exists($audfilesent)) $audioFile = $audfilesent;
-					$localaudfile = 'Workshop/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
+					$localaudfile = 'workshop/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 					if (file_exists($localaudfile)) $audioFile = $localaudfile;
 				} else {
 					$audfile = 'WA-Media/WhatsApp Audio/'.$fn.'.aac';
 					if (file_exists($audfile)) $audioFile = $audfile;
-					$localaudfile = 'Workshop/'.$fn.'.aac';
+					$localaudfile = 'workshop/'.$fn.'.aac';
 					if (file_exists($localaudfile)) $audioFile = $localaudfile;
 				}
 				
 				// 1. Move the sticker and audio to the new pack folder
 				rename($stk, $targetDir.'/'.$fn.'.webp');
 				if (isset($audioFile)) if (file_exists($audioFile)) {
-					if (str_starts_with($audioFile, 'Workshop/'))
+					if (str_starts_with($audioFile, 'workshop/'))
 						rename($audioFile, $targetDir.'/'.$fn.'.aac');
 					else
 						copy($audioFile, $targetDir.'/'.$fn.'.aac');
 				}
-				if (file_exists('Workshop/_tray.png'))
-					rename('Workshop/_tray.png', $targetDir.'/_tray.png');
+				if (file_exists('workshop/_tray.png'))
+					rename('workshop/_tray.png', $targetDir.'/_tray.png');
 				
 				// 2. Clean up
-				if (file_exists('Workshop/'.$fn.'.src')) unlink('Workshop/'.$fn.'.src');
-				$frameMap = 'Workshop/'.$fn.'_framemap.txt';
+				if (file_exists('workshop/'.$fn.'.src')) unlink('workshop/'.$fn.'.src');
+				$frameMap = 'workshop/'.$fn.'_framemap.txt';
 				if (file_exists($frameMap)) unlink($frameMap);
 			}
 
@@ -1247,7 +1247,7 @@ echo'<div id=serverChat>';
 		}	
 		if (isset($_POST['MoveIntoPrivatePackage'])) {
 			$packName = $_POST['MoveIntoPrivatePackage'] ?? '';
-			$stickers = glob('Workshop/*.webp');
+			$stickers = glob('workshop/*.webp');
 			// sort by modified date ascending
 			usort($stickers,'mdate_asc');
 			
@@ -1256,7 +1256,7 @@ echo'<div id=serverChat>';
 				$packName == date("Y-m");
 			}
 			
-			$targetDir = 'PrivatePacks/'.$packName;
+			$targetDir = 'privatepacks/'.$packName;
 			if (!is_dir($targetDir)) mkdir($targetDir);
 
 			// Move .webp files and sanitize Workshop
@@ -1270,29 +1270,29 @@ echo'<div id=serverChat>';
 					if (file_exists($audfile)) $audioFile = $audfile;
 					$audfilesent = 'WA-Media/WhatsApp Audio/Sent/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 					if (file_exists($audfilesent)) $audioFile = $audfilesent;
-					$localaudfile = 'Workshop/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
+					$localaudfile = 'workshop/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 					if (file_exists($localaudfile)) $audioFile = $localaudfile;
 				} else {
 					$audfile = 'WA-Media/WhatsApp Audio/'.$fn.'.aac';
 					if (file_exists($audfile)) $audioFile = $audfile;
-					$localaudfile = 'Workshop/'.$fn.'.aac';
+					$localaudfile = 'workshop/'.$fn.'.aac';
 					if (file_exists($localaudfile)) $audioFile = $localaudfile;
 				}
 				
 				// 1. Move the sticker and audio to the new pack folder
 				rename($stk, $targetDir.'/'.$fn.'.webp');
 				if (isset($audioFile)) if (file_exists($audioFile)) {
-					if (str_starts_with($audioFile, 'Workshop/'))
+					if (str_starts_with($audioFile, 'workshop/'))
 						rename($audioFile, $targetDir.'/'.$fn.'.aac');
 					else
 						copy($audioFile, $targetDir.'/'.$fn.'.aac');
 				}
-				if (file_exists('Workshop/_tray.png'))
-					rename('Workshop/_tray.png', $targetDir.'/_tray.png');
+				if (file_exists('workshop/_tray.png'))
+					rename('workshop/_tray.png', $targetDir.'/_tray.png');
 				
 				// 2. Clean up
-				if (file_exists('Workshop/'.$fn.'.src')) unlink('Workshop/'.$fn.'.src');
-				$frameMap = 'Workshop/'.$fn.'_framemap.txt';
+				if (file_exists('workshop/'.$fn.'.src')) unlink('workshop/'.$fn.'.src');
+				$frameMap = 'workshop/'.$fn.'_framemap.txt';
 				if (file_exists($frameMap)) unlink($frameMap);
 			}
 
@@ -1339,10 +1339,10 @@ echo'<div id=serverChat>';
 			}
 			else {
 				$filename = $_POST['Update'];
-				$sourcePath = 'Workshop/'.$filename.'.src';
+				$sourcePath = 'workshop/'.$filename.'.src';
 				if (file_exists($sourcePath)) $source = trim(file_get_contents($sourcePath));
 				if (file_exists($source)) {
-					if (copy('Workshop/'.$filename.'.webp', $source))
+					if (copy('workshop/'.$filename.'.webp', $source))
 						replyUp('Updated '.$source, $_POST['reqID']);
 					else
 						replyDown('Failed to update '.$source, $_POST['reqID']);
@@ -1366,7 +1366,7 @@ echo'<div id=serverChat>';
 			else $publisher = $ownerName.$deviceName.'WAStks';
 			
 			unset($package);
-			$PublicPacks = glob('Packs/*', GLOB_ONLYDIR);
+			$PublicPacks = glob('packs/*', GLOB_ONLYDIR);
 			rsort($PublicPacks);
 			if (count($PublicPacks)) {
 				foreach($PublicPacks as $i => $stickerpack) {
@@ -1393,7 +1393,7 @@ echo'<div id=serverChat>';
 					$package[$i]['animated_sticker_pack']=true;
 					$package[$i]['stickers']=array();
 
-					$publicfiles = glob('Packs/'.$folder.'/*.webp');
+					$publicfiles = glob('packs/'.$folder.'/*.webp');
 					sort($publicfiles);
 					if (!file_exists($stickerpack.'/_tray.png')) {
 						$firstSticker = $publicfiles[0];
@@ -1451,7 +1451,7 @@ echo'<div id=serverChat>';
 				$output['android_play_store_link']="https://play.google.com/store/apps/details?id=app.spuqui.wastks";
 				$output['sticker_packs']=$package;
 				$outputJSON = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-				if ($f=fopen('Packs/contents.json', 'w')) {
+				if ($f=fopen('packs/contents.json', 'w')) {
 					fwrite($f, $outputJSON);
 					fclose($f);
 					if (!is_dir($androidMediaBase)) {
@@ -1459,15 +1459,15 @@ echo'<div id=serverChat>';
 					}
 				}
 			} else {
-				if (file_exists('Packs/contents.json')) {
-					unlink('Packs/contents.json');
+				if (file_exists('packs/contents.json')) {
+					unlink('packs/contents.json');
 				}
 				replyUp('No Public Packs to process.', $_POST['reqID']);
 			}
 
 			$appFolder = $androidMediaBase . '/app.spuqui.wastks';
 			$targetPacks = $appFolder . '/packs';
-			$sourcePacks = 'Packs/';				// Local folder in ~/WAStks/
+			$sourcePacks = 'packs/';				// Local folder in ~/WAStks/
 
 			// Check if we are on an Android device with Media storage access
 			if (is_dir($androidMediaBase)) {
@@ -1493,7 +1493,7 @@ echo'<div id=serverChat>';
 			}
 			
 			unset($package);
-			$PrivatePacks = glob('PrivatePacks/*', GLOB_ONLYDIR);
+			$PrivatePacks = glob('privatepacks/*', GLOB_ONLYDIR);
 			rsort($PrivatePacks);
 			if (count($PrivatePacks)) {
 				foreach($PrivatePacks as $i => $stickerpack) {
@@ -1520,7 +1520,7 @@ echo'<div id=serverChat>';
 					$package[$i]['animated_sticker_pack']=true;
 					$package[$i]['stickers']=array();
 
-					$privatefiles = glob('PrivatePacks/'.$folder.'/*.webp');
+					$privatefiles = glob('privatepacks/'.$folder.'/*.webp');
 					sort($privatefiles);
 					if (!file_exists($stickerpack.'/_tray.png')) {
 						$firstSticker = $privatefiles[0];
@@ -1580,7 +1580,7 @@ echo'<div id=serverChat>';
 				$output['sticker_packs']=$package;
 				$outputJSON = json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
-				if ($f=fopen('PrivatePacks/contents.json', 'w')) {
+				if ($f=fopen('privatepacks/contents.json', 'w')) {
 					fwrite($f, $outputJSON);
 					fclose($f);
 					if (!is_dir($androidMediaBase)) {
@@ -1588,14 +1588,14 @@ echo'<div id=serverChat>';
 					}
 				}
 			} else {
-				if (file_exists('PrivatePacks/contents.json')) {
-					unlink('PrivatePacks/contents.json');
+				if (file_exists('privatepacks/contents.json')) {
+					unlink('privatepacks/contents.json');
 				}
 				replyUp('No Private Packs to process.', $_POST['reqID']);
 			}
 			$appFolder = $androidMediaBase . '/app.spuqui.wastks';
 			$targetPrivatePacks = $appFolder . '/privatepacks';
-			$sourcePrivatePacks = 'PrivatePacks/';	// Local folder in ~/WAStks/
+			$sourcePrivatePacks = 'privatepacks/';	// Local folder in ~/WAStks/
 
 			// Check if we are on an Android device with Media storage access
 			if (is_dir($androidMediaBase)) {

@@ -713,11 +713,11 @@ function toggleFolderFilter(folder) {
 			if (!folderToggle.classList.contains('toggled')) folderToggle.classList.add('toggled');
 			setCookie('filteredFolder',folder,1);
 			let packName=folder;
-			if (folder.startsWith("Packs/")) {
+			if (folder.startsWith("packs/")) {
 				packName = folder.slice(6);
 				const packNameInput = document.getElementById('PackageName');
 				if (packNameInput) packNameInput.value = packName;
-			} else if (folder.startsWith("PrivatePacks/")) {
+			} else if (folder.startsWith("privatepacks/")) {
 				packName = folder.slice(13);
 				const packNameInput = document.getElementById('PackageName');
 				if (packNameInput) packNameInput.value = packName;
@@ -1053,14 +1053,14 @@ async function buildStickersFromManifest() {
 
 				// 2. STICKER PACKS: Individual buttons for each pack
 				const packs = Object.keys(manifest.allFolders);
-				const packSubfolders = packs.filter(f => f.startsWith('Packs/') && f !== 'Packs');
+				const packSubfolders = packs.filter(f => f.startsWith('packs/') && f !== 'packs');
 				packSubfolders.forEach(f => {
 					const trayPath = `${baseUrl}${f}/_tray.png`;
 					barHtml += buildStickerPackButtonJS(f, manifest.allFolders[f], trayPath);
 				});
 
 				// 3. PRIVATE STICKER PACKS: Individual buttons for each pack
-				const privatePackSubfolders = packs.filter(f => f.startsWith('PrivatePacks/') && f !== 'PrivatePacks');
+				const privatePackSubfolders = packs.filter(f => f.startsWith('privatepacks/') && f !== 'privatepacks');
 				privatePackSubfolders.forEach(f => {
 					const trayPath = `${baseUrl}${f}/_tray.png`;
 					barHtml += buildStickerPackButtonJS(f, manifest.allFolders[f], trayPath);
@@ -1243,8 +1243,8 @@ function buildFolderButtonJS(folder, count, img) {
         </span>`;
 }
 function buildStickerPackButtonJS(folder, count, img) {
-    const isPrivate = (img && img.startsWith('PrivatePacks')) || (folder && folder.startsWith('PrivatePacks'));
-    const isUrl = img && ( img.startsWith('http') || img.startsWith('Packs') || img.startsWith('PrivatePacks') || img.startsWith('assets') );
+    const isPrivate = (img && img.startsWith('privatepacks')) || (folder && folder.startsWith('privatepacks'));
+    const isUrl = img && ( img.startsWith('http') || img.startsWith('packs') || img.startsWith('privatepacks') || img.startsWith('assets') );
     
     let imgHtml = isUrl ? `<img src="${img}">` : `📦`;
     
@@ -1268,7 +1268,7 @@ function buildStickerPackButtonJS(folder, count, img) {
 function buildSubfolderTogButtonJS(folder, count, img) {
     let divID = '';
     if (folder === 'WA-Media/WhatsApp Stickers') divID = 'stickersSubfolders';
-    else if (folder === 'Packs') divID = 'stickerPacksSubfolders';
+    else if (folder === 'packs') divID = 'stickerPacksSubfolders';
     
     if (!divID) return '';
 
@@ -2145,8 +2145,8 @@ function applySignatureTemplate() {
         const pathPart = originPath.substring(0, lastSlash);
         const filePart = originPath.substring(lastSlash + 1).replace('.webp', '').replace('_Sub_', '_');
 
-        if (pathPart.includes('Packs/')) {
-            const parts = pathPart.split('Packs/');
+        if (pathPart.includes('packs/')) {
+            const parts = pathPart.split('packs/');
             if (parts[1]) packName = parts[1].split('/')[0];
 			if (packName.substring(0,1)=='_') packName = packName.substring(1);
         }

@@ -191,7 +191,7 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 
 				if (isset($sticker['source'])) {
 					echo '<input type=hidden id="'.$sticker['filename'].'source" value="'.$sticker['source'].'">'.PHP_EOL;
-					if (file_exists('Favorites/'.$sticker['filename'].'.fav'))	echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Remove from Favorites">❤</button>';
+					if (file_exists('favorites/'.$sticker['filename'].'.fav'))	echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Remove from Favorites">❤</button>';
 					else														echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Add to Favorites" style="opacity:0.33;">❤</button>';
 				}
 				echo '<button title="Unlink '.$sticker['filename'].'" onclick="post(\'Unlink\', \''.$sticker['filename'].'\')" class="emoji">⛓️‍💥</button>'.PHP_EOL;
