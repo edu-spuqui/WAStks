@@ -244,7 +244,7 @@ echo'<div id=owner-server-content>';
 	$hostname = $ownerName.$deviceName.'WAStks';
 	$publisherFile = '.owner/publisher.txt';
 	if (file_exists($publisherFile)) 			$publisher = trim(file_get_contents($publisherFile));
-	else										$publisher = $ownerName.$deviceName;
+	else										$publisher = $ownerName;
 
 	if (!file_exists('owner-manifest.json')) {
 		$allFolders = [];

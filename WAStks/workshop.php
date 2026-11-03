@@ -35,14 +35,14 @@ function getWorkshopStickerInfo($pathfilename) {
 		$stkdate = substr($stk['filename'],4,8);
 		$stkindex = substr($stk['filename'],-4,4);
 		$audindex = sprintf("%04d", intval($stkindex) + 1);
-		$localaudfile = 'Workshop/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
+		$localaudfile = 'workshop/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 		if (file_exists($localaudfile)) $stk['audioFile'] = $localaudfile;
 		$audfile = 'WA-Media/WhatsApp Audio/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 		if (file_exists($audfile)) $stk['audioFile'] = $audfile;
 		$audfilesent = 'WA-Media/WhatsApp Audio/Sent/AUD-'.$stkdate.'-WA'.$audindex.'.aac';
 		if (file_exists($audfilesent)) $stk['audioFile'] = $audfilesent;
-		if (file_exists('Workshop/'.$stk['filename'].'.aac'))
-			$stk['audioFile'] = 'Workshop/'.$stk['filename'].'.aac';
+		if (file_exists('workshop/'.$stk['filename'].'.aac'))
+			$stk['audioFile'] = 'workshop/'.$stk['filename'].'.aac';
 	} else {
 		if (file_exists($stk['dirname'].'/'.$stk['filename'].'.aac'))
 			$stk['audioFile'] = $stk['dirname'].'/'.$stk['filename'].'.aac';
@@ -191,7 +191,7 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 
 				if (isset($sticker['source'])) {
 					echo '<input type=hidden id="'.$sticker['filename'].'source" value="'.$sticker['source'].'">'.PHP_EOL;
-					if (file_exists('favorites/'.$sticker['filename'].'.fav'))	echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Remove from Favorites">❤</button>';
+					if (file_exists('Favorites/'.$sticker['filename'].'.fav'))	echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Remove from Favorites">❤</button>';
 					else														echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Add to Favorites" style="opacity:0.33;">❤</button>';
 				}
 				echo '<button title="Unlink '.$sticker['filename'].'" onclick="post(\'Unlink\', \''.$sticker['filename'].'\')" class="emoji">⛓️‍💥</button>'.PHP_EOL;
@@ -218,7 +218,7 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 }
 
 //unset($sourceStickers);
-$workshopStickers = glob('Workshop/*.webp', GLOB_NOSORT);
+$workshopStickers = glob('workshop/*.webp', GLOB_NOSORT);
 
 if (count($workshopStickers)>0) {
 	echo'<div id=workshop-content>';
@@ -231,8 +231,8 @@ if (count($workshopStickers)>0) {
 		unset($sticker);
 		$sticker = getWorkshopStickerInfo($file);
 		
-		if (file_exists('Workshop/'.$sticker['filename'].'.src')) {
-			$sticker['source'] = file_get_contents('Workshop/'.$sticker['filename'].'.src');
+		if (file_exists('workshop/'.$sticker['filename'].'.src')) {
+			$sticker['source'] = file_get_contents('workshop/'.$sticker['filename'].'.src');
 			//$sourceStickers[] = $sticker['source'];
 		}
 		
