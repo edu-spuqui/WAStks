@@ -48,6 +48,8 @@ if [ ! -e "$HOME/wastks/WAStks/WA-Media" ]; then
 fi
 echo Setting Apache to run as a service...
 sv-enable httpd
+echo Restarting the service to apply config changes
+sv restart httpd
 echo Apache service current status:
 sv status httpd
 echo =========================================
