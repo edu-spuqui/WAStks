@@ -4,6 +4,7 @@ echo'<div id=owner-server-content>';
 	if (!is_dir('Favorites'))	mkdir('Favorites', 0777, true);
 	if (!is_dir('packs'))		mkdir('packs', 0777);
 	if (!is_dir('privatepacks'))mkdir('privatepacks', 0777);
+	if (!file_exists('privatepacks/.htaccess')) file_put_contents('privatepacks/.htaccess', "Options -Indexes\n");
 	if (!is_dir('workshop'))	mkdir('workshop', 0777);
 	if (!is_dir('Logs'))		mkdir('Logs', 0777);
 	if (!is_dir('temp'))		mkdir('temp', 0777);
@@ -583,8 +584,11 @@ echo'<div id=owner-server-content>';
 		// updateFavorites('rename','2026-05-WAStks','2026-04');
 		
 		//cleanUpFavorites();
-		updateFavorites('check','','');
-		showFavoritesDetails();
+		//updateFavorites('check','','');
+		updateFavorites('rename','Privatepacks/','privatepacks/');
+		updateFavorites('rename','PrivatePacks/','privatepacks/');
+		updateFavorites('rename','Packs/','packs/');
+		//showFavoritesDetails();
 	}
 	
 	//	Process translation of emojis json
