@@ -4,7 +4,28 @@ echo'<div id=owner-server-content>';
 	if (!is_dir('Favorites'))	mkdir('Favorites', 0777, true);
 	if (!is_dir('packs'))		mkdir('packs', 0777);
 	if (!is_dir('privatepacks'))mkdir('privatepacks', 0777);
-	if (!file_exists('privatepacks/.htaccess')) file_put_contents('privatepacks/.htaccess', "Options -Indexes\n");
+	$htpasswdDir = realpath(__DIR__ . '/..');
+	$htpasswdAbsPath = ($htpasswdDir ? str_replace('\\', '/', $htpasswdDir) : __DIR__ . '/..') . '/.htpasswd';
+	if (!file_exists('privatepacks/.htaccess')) {
+		$htaccessContent = "Options -Indexes\n" .
+						   "AuthType Basic\n" .
+						   "AuthName \"Restricted Private Packs\"\n" .
+						   "AuthUserFile \"" . $htpasswdAbsPath . "\"\n" .
+						   "Require valid-user\n";
+		file_put_contents('privatepacks/.htaccess', $htaccessContent);
+	}
+	$ownerNameFile = '.owner/name.txt';
+	if (file_exists($ownerNameFile)) 			$ownerName = trim(file_get_contents($ownerNameFile));
+	$htpasswdPath = __DIR__ . '/../.htpasswd';
+	if (!file_exists($htpasswdPath)) {
+		if (isset($ownerName)) $username = $ownerName;
+		else					$username = 'admin';
+		$password = $_COOKIE['owner_auth'];
+		
+		$hash = password_hash($password, PASSWORD_BCRYPT);
+		
+		file_put_contents($htpasswdPath, "{$username}:{$hash}\n");
+	}
 	if (!is_dir('workshop'))	mkdir('workshop', 0777);
 	if (!is_dir('Logs'))		mkdir('Logs', 0777);
 	if (!is_dir('temp'))		mkdir('temp', 0777);
@@ -101,11 +122,11 @@ echo'<div id=owner-server-content>';
 				$folderStickers = glob($folder.'/*.webp');
 				if ($folderStickers) {
 					if (str_starts_with($folder,'packs')) {
-						// sort by modified date descending
-						usort($folderStickers,'mdate_desc');
+						// sort by name ascending
+						sort($folderStickers);
 					} else if (str_starts_with($folder,'privatepacks')) {
-						// sort by modified date descending
-						usort($folderStickers,'mdate_desc');
+						// sort by name ascending
+						sort($folderStickers);
 					} else if (str_starts_with($folder,'WA-Media/WhatsApp Stickers/')) {
 						// sort by name descending == date descending
 						rsort($folderStickers);
@@ -236,8 +257,6 @@ echo'<div id=owner-server-content>';
 
 	if (isset($_COOKIE['privateVisibility'])) 	$privateVisibility = $_COOKIE['privateVisibility'];
 	else										$privateVisibility = 'show';
-	$ownerNameFile = '.owner/name.txt';
-	if (file_exists($ownerNameFile)) 			$ownerName = trim(file_get_contents($ownerNameFile));
 	$deviceNameFile = '.owner/device.txt';
 	if (file_exists($deviceNameFile)) 			$deviceName = trim(file_get_contents($deviceNameFile));
 	else										$deviceName = gethostname();
@@ -382,7 +401,8 @@ echo'<div id=owner-server-content>';
 					echo'<span><a href="'.$serverWanLink.'">'.$zrokalias.'.share.zrok.io</a></span>';
 					echo genQRcode($serverWanLink);
 				echo'</div>';
-			} else {
+			}
+			else {
 				if (isset($serverIP)) {
 					$serverLanLink = 'http://'.$serverIP.':8269';
 					echo'<div class="qrcode">';
@@ -585,10 +605,10 @@ echo'<div id=owner-server-content>';
 		
 		//cleanUpFavorites();
 		//updateFavorites('check','','');
-		updateFavorites('rename','Privatepacks/','privatepacks/');
-		updateFavorites('rename','PrivatePacks/','privatepacks/');
-		updateFavorites('rename','Packs/','packs/');
-		//showFavoritesDetails();
+		//updateFavorites('rename','Privatepacks/','privatepacks/');
+		//updateFavorites('rename','PrivatePacks/','privatepacks/');
+		//updateFavorites('rename','packs/','packs/spuqui.');
+		showFavoritesDetails();
 	}
 	
 	//	Process translation of emojis json

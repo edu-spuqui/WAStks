@@ -712,25 +712,25 @@ function toggleFolderFilter(folder) {
 		if (folderToggle) {
 			if (!folderToggle.classList.contains('toggled')) folderToggle.classList.add('toggled');
 			setCookie('filteredFolder',folder,1);
-			let packName=folder;
+			let packName = folder;
 			if (folder.startsWith("packs/")) {
 				packName = folder.slice(6);
-				const packNameInput = document.getElementById('PackageName');
-				if (packNameInput) packNameInput.value = packName;
+				let ownerName;
+				const ownerNameSpan = document.getElementById('owner_name');
+				if (ownerNameSpan) ownerName = ownerNameSpan.innerText.trim();
+				if (ownerName && packName.startsWith(ownerName.toLowerCase() + '.')) {
+					let prefixLength = ownerName.length + 1;
+					packName = packName.slice(prefixLength);
+				}
 			} else if (folder.startsWith("privatepacks/")) {
 				packName = folder.slice(13);
-				const packNameInput = document.getElementById('PackageName');
-				if (packNameInput) packNameInput.value = packName;
 			} else if (folder.startsWith("User-Media/Stickers/")) {
 				packName = folder.slice(20);
-				const packNameInput = document.getElementById('PackageName');
-				if (packNameInput) packNameInput.value = packName;
-			} else {
-				const packNameInput = document.getElementById('PackageName');
-				if (packNameInput) packNameInput.value = packName;
 			}
+			const packNameInput = document.getElementById('PackageName');
+			if (packNameInput) packNameInput.value = packName;
 			const stickerPackNameInput = document.getElementById('stickerPackName');
-			if (stickerPackNameInput) stickerPackNameInput.value=packName;
+			if (stickerPackNameInput) stickerPackNameInput.value = packName;
 			if (StickerCards) StickerCards.forEach( function (stkcard) {
 				let show = false;
 				if (folder=='Favorites') {
@@ -1066,7 +1066,7 @@ async function buildStickersFromManifest() {
 					barHtml += buildStickerPackButtonJS(f, manifest.allFolders[f], trayPath);
 				});
 
-				// 4. RECURSIVE FOLDERS (Stickers Branch)
+				// 4. RECURSIVE FOLDERS (Stickers Branch) - Always Visible
 				const folders = Object.keys(manifest.allFolders);
 				const mSep = folders.find(f => f.includes('\\')) ? '\\' : '/';
 				const WAlibRoot = 'WA-Media' + mSep + 'WhatsApp Stickers';
@@ -1078,10 +1078,9 @@ async function buildStickersFromManifest() {
 				});
 
 				libraryFolderKeys.forEach(f => {
-					// 1. DEFINE LOGIC FIRST (Fixes the ReferenceError)
 					const normalize = (path) => path.replace(/\\+|\//g, '/');
 					const fNorm = normalize(f);
-					const comfyNorm = normalize('ComfyUI')
+					const comfyNorm = normalize('ComfyUI');
 					const libRootNorm = normalize(libRoot);
 					const WAlibRootNorm = normalize(WAlibRoot);
 
@@ -1092,39 +1091,21 @@ async function buildStickersFromManifest() {
 						parentPathNorm = parts.join('/');
 					}
 
-					const isRoot = (fNorm === libRootNorm)||(fNorm === WAlibRootNorm);
-					const isImmediateChild = (parentPathNorm === libRootNorm);
-					const isExtra = (fNorm === comfyNorm);
-					const isVisibleInitially = (isRoot || isImmediateChild || isExtra);
+					const isRoot = (fNorm === libRootNorm) || (fNorm === WAlibRootNorm);
 
-					// 2. PERFORMANCE: Lazy-Loading Image Logic
-					// We use a static placeholder for hidden subfolders to save CPU/RAM
+					// Determine thumbnail immediately without lazy-loading placeholders
 					const staticPlaceholder = 'assets/wastk.webp'; 
 					let currentThumb = isRoot ? 'assets/wastk.webp' : null;
-					if (f==='ComfyUI') currentThumb = 'assets/comfyui.png';
-					let pendingThumb = "";
+					if (f === 'ComfyUI') currentThumb = 'assets/comfyui.png';
 					
 					if (!currentThumb) {
 						const firstStk = manifest.allStickers.find(s => s.dirname === f);
-						const fullUrl = firstStk ? `${baseUrl}${firstStk.dirname}${mSep}${firstStk.filename}.webp` : staticPlaceholder;
-						
-						if (isVisibleInitially) {
-							currentThumb = fullUrl; // Load animated icon now
-						} else {
-							currentThumb = staticPlaceholder; // Use static icon for now
-							pendingThumb = fullUrl; // Save animated icon for when clicked
-						}
+						currentThumb = firstStk ? `${baseUrl}${firstStk.dirname}${mSep}${firstStk.filename}.webp` : staticPlaceholder;
 					}
 
-					// 3. BUILD BUTTON
+					// BUILD BUTTON
 					const count = manifest.allFolders[f];
 					let btnHtml = buildFolderButtonJS(f, count, currentThumb);
-
-					// 4. VISIBILITY & ATTRIBUTES
-					const hiddenClass = isVisibleInitially ? '' : ' folder-hidden';
-					
-					// Inject data-pending if we have a deferred animation
-					const pendingAttr = pendingThumb ? ` data-pending="${pendingThumb}"` : "";
 
 					const hasSubfolders = libraryFolderKeys.some(fSub => {
 						const fSubNorm = normalize(fSub);
@@ -1135,8 +1116,9 @@ async function buildStickersFromManifest() {
 						btnHtml = btnHtml.replace('<button', '<button class="has-children-indicator"');
 					}
 
+					// Render without folder-hidden or pending attributes so everything stays visible
 					btnHtml = btnHtml.replace('class="folderButton"', 
-						`class="folderButton${hiddenClass}" data-lib="true" data-norm-path="${fNorm}" data-norm-parent="${parentPathNorm}"${pendingAttr}`);
+						`class="folderButton" data-lib="true" data-norm-path="${fNorm}" data-norm-parent="${parentPathNorm}"`);
 					
 					barHtml += btnHtml;
 				});
@@ -1144,57 +1126,7 @@ async function buildStickersFromManifest() {
 				// FINAL ASSEMBLED RENDER
 				folderContainer.innerHTML = barHtml;
 			}
-
-			// --- Place at the end of buildStickersFromManifest ---
-			document.querySelectorAll('.folderButton[data-lib="true"] button').forEach(btn => {
-				const wrapper = btn.closest('.folderButton');
-				const myPath = wrapper.getAttribute('data-norm-path');
-				const myParentPath = wrapper.getAttribute('data-norm-parent');
-				
-				const originalFilter = btn.onclick;
-				
-				btn.onclick = (e) => {
-					if (e) e.stopPropagation();
-					
-					// 1. Run the original gallery filter
-					if (originalFilter) originalFilter.apply(btn, [e]);
-
-					// 2. Visual state update
-					wrapper.classList.add('is-expanded');
-
-					// 3. HIDE siblings' branches (Accordion)
-					const siblings = document.querySelectorAll(`.folderButton[data-norm-parent="${CSS.escape(myParentPath)}"]`);
-					siblings.forEach(sib => {
-						const sibPath = sib.getAttribute('data-norm-path');
-						if (sibPath !== myPath) {
-							// Find all descendants and hide them
-							document.querySelectorAll(`.folderButton[data-norm-path^="${CSS.escape(sibPath)}/"]`).forEach(desc => {
-								desc.classList.add('folder-hidden'); 
-								desc.classList.remove('is-expanded');
-							});
-						}
-					});
-
-					// 4. SHOW my direct children and ACTIVATE their animations
-					const myChildren = document.querySelectorAll(`.folderButton[data-norm-parent="${CSS.escape(myPath)}"]`);
-					myChildren.forEach(child => {
-						// Make them visible
-						child.classList.remove('folder-hidden'); 
-
-						// PERFORMANCE: Check for pending animated icon
-						const pendingUrl = child.getAttribute('data-pending');
-						if (pendingUrl) {
-							const img = child.querySelector('img');
-							if (img) {
-								img.src = pendingUrl; // Swap placeholder for real animation
-							}
-							// Remove attribute so we don't force a reload on every click
-							child.removeAttribute('data-pending'); 
-						}
-					});
-				};
-			});	
-
+			
 			// 4. Post-Render Logic
 			if (typeof initStickerObserver === 'function') { initStickerObserver(); }
 			requestAnimationFrame(() => {
@@ -2373,17 +2305,18 @@ window.onload = async function() {
 		}
 	});	
 	
-	await buildStickersFromManifest();
-	enableHorizontalDrag('#allFolders');
-
 	document.getElementById('ownerLoginPage').scrollIntoView({ behavior: 'instant' });
 	await loadContent('owner-login', 'owner-login.php');
+
+	await buildStickersFromManifest();
+	enableHorizontalDrag('#allFolders');
 
 	let ownerName;
 	const ownerNameSpan = document.getElementById('owner_name');
 	if (ownerNameSpan) ownerName = ownerNameSpan.innerText;
 
-	if (ownerName) {
+	let isOwner = getCookie('owner_auth');
+	if (isOwner) {
 		fullServerMsg('Welcome back to WAStks, '+ownerName+'!','');
 		console.log(getTimestamp() + ' Welcome back to WAStks, '+ownerName+'!');
 		document.getElementById('view-pager').focus();

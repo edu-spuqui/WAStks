@@ -385,23 +385,23 @@ function renderPhoneForm($filename) {
 	if ($lastSticker) {
 		$copy = shell_exec('adb shell "su -c cp -v -f '.$wasp.$lastSticker.' '.$ando.$lastSticker.'"');
 		if (str_starts_with($copy,'cp ')) {
-			shell_exec('adb pull '.$ando.$lastSticker.' Temp/'.$lastSticker);
+			shell_exec('adb pull '.$ando.$lastSticker.' temp/'.$lastSticker);
 			shell_exec('adb shell "su -c rm '.$ando.$lastSticker.'"');
-			copy('Temp/'.$lastSticker, 'Temp/lastSticker.webp');
-			unlink('Temp/'.$lastSticker);
+			copy('temp/'.$lastSticker, 'temp/lastSticker.webp');
+			unlink('temp/'.$lastSticker);
 		}
 		echo '<div id="phone-form">';
 			echo '<input type="hidden" id="PhoneFor" value="'.$filename.'">';
 			echo '<img src="workshop/'.$filename.'.webp">';
 			echo '<button title="Update Phone\'s Last Sticker" class="topBarButton" onclick="updateLastSticker(\''.$filename.'\', \''.$lastSticker.'\')">📲</button>';
-			echo '<img title="Last Sticker" src="Temp/lastSticker.webp?v='.time().'">';
+			echo '<img title="Last Sticker" src="temp/lastSticker.webp?v='.time().'">';
 		echo '</div>';
 	} else {
 		echo '<div id="phone-form">';
 			echo '<input type="hidden" id="PhoneFor" value="'.$filename.'">';
 			echo '<img title="Workshop Sticker" src="workshop/'.$filename.'.webp">';
 			echo '<button disabled title="DISABLED - Update Phone\'s Last Sticker" class="topBarButton" onclick="">📲</button>';
-			echo '<img title="Last Sticker Unavailable" src="Temp/lastSticker.webp?v='.time().'">';
+			echo '<img title="Last Sticker Unavailable" src="temp/lastSticker.webp?v='.time().'">';
 		echo '</div>';
 	}
 }
@@ -546,7 +546,7 @@ echo'<div id=serverChat>';
 				}
 			}
 			if ($_POST['Clear']=='ImgSeq') {
-				$png = glob('Temp/png/*.png');
+				$png = glob('temp/png/*.png');
 				$count = 0;
 				foreach ($png as $file) {
 					if (unlink($file)) {
@@ -555,7 +555,7 @@ echo'<div id=serverChat>';
 						replyDown('Failed to delete '.$file, $_POST['reqID'] ?? '');
 					}
 				}
-				$webp = glob('Temp/webp/*.webp');
+				$webp = glob('temp/webp/*.webp');
 				foreach ($webp as $file) {
 					if (unlink($file)) {
 						$count++;
@@ -740,9 +740,9 @@ echo'<div id=serverChat>';
 							$currIndex = "0".$currIndex;
 						}
 					}
-					shell_exec('webpmux -get frame '.$j.' "workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$currIndex.'.webp"');
+					shell_exec('webpmux -get frame '.$j.' "workshop/'.$filename.'.webp" -o "temp/webp/'.$filename.$currIndex.'.webp"');
 				}
-				shell_exec('webpmux -get frame 1 "workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$FrameCount.'.webp"');
+				shell_exec('webpmux -get frame 1 "workshop/'.$filename.'.webp" -o "temp/webp/'.$filename.$FrameCount.'.webp"');
 				$cmdout = 'Disassembled '.$filename.' into '.$FrameCount.' frames';
 			} else {
 				$webpinfoString = shell_exec('webpinfo "workshop/'.$filename.'.webp"');
@@ -778,7 +778,7 @@ echo'<div id=serverChat>';
 							$currIndex = "0".$currIndex;
 						}
 					}
-					shell_exec('webpmux -get frame '.$j.' "workshop/'.$filename.'.webp" -o "Temp/webp/'.$filename.$currIndex.'.webp"');
+					shell_exec('webpmux -get frame '.$j.' "workshop/'.$filename.'.webp" -o "temp/webp/'.$filename.$currIndex.'.webp"');
 				}
 				$cmdout = 'Disassembled '.$filename.' into '.$FrameCount.' frames';
 				
@@ -932,7 +932,7 @@ echo'<div id=serverChat>';
 			$bin .= pack('V', 0x16);
 			$bin .= $newsignature;
 			
-			$exifPath = 'Temp/'.$filename.'.exif';
+			$exifPath = 'temp/'.$filename.'.exif';
 			file_put_contents($exifPath, $bin);
 
 			$cmd = "webpmux -set exif \"$exifPath\" \"$pathfilename\" -o \"$pathfilename\"";
@@ -948,7 +948,7 @@ echo'<div id=serverChat>';
 		}
 		if (isset($_POST['DeletePNGSequence'])) {
 			$SeqName = $_POST['DeletePNGSequence'];
-			$SeqFiles = glob('Temp/png/'.$SeqName.'*.png');
+			$SeqFiles = glob('temp/png/'.$SeqName.'*.png');
 			$count = 0;
 			foreach($SeqFiles as $file) {
 				if (unlink($file)) $count += 1;
@@ -961,7 +961,7 @@ echo'<div id=serverChat>';
 		}
 		if (isset($_POST['DeleteWebPSequence'])) {
 			$SeqName = $_POST['DeleteWebPSequence'];
-			$SeqFiles = glob('Temp/webp/'.$SeqName.'*.webp');
+			$SeqFiles = glob('temp/webp/'.$SeqName.'*.webp');
 			$count = 0;
 			foreach($SeqFiles as $file) {
 				if (unlink($file)) {
@@ -979,11 +979,11 @@ echo'<div id=serverChat>';
 			$SeqName = $_POST['Convert2WebP'];
 			$Quality = $_REQUEST['Quality'];
 			
-			$SeqFiles = glob('Temp/png/'.$SeqName.'*.png');
+			$SeqFiles = glob('temp/png/'.$SeqName.'*.png');
 			if (count($SeqFiles)==1) {
 				// Static Sticker
 				$png = pathinfo($SeqFiles[0]);
-				$cmd = shell_exec('cwebp -q '.$Quality.' -alpha_q '.$Quality.' -m 6 -mt -quiet "Temp/png/'.$png['basename'].'" -o "workshop/'.$png['filename'].'.webp"');
+				$cmd = shell_exec('cwebp -q '.$Quality.' -alpha_q '.$Quality.' -m 6 -mt -quiet "temp/png/'.$png['basename'].'" -o "workshop/'.$png['filename'].'.webp"');
 				replyUp('Success!', $_POST['reqID'] ?? '');
 				serverMsg('Created Static Sticker '.$cmd, '');
 			} else {
@@ -991,7 +991,7 @@ echo'<div id=serverChat>';
 				forEach($SeqFiles as $png) {
 					$pngbase = basename($png);
 					$pngfile = basename($pngbase, '.png');
-					shell_exec('cwebp -q '.$Quality.' -alpha_q '.$Quality.' -m 6 -mt -quiet "Temp/png/'.$pngbase.'" -o "Temp/webp/'.$pngfile.'.webp"');
+					shell_exec('cwebp -q '.$Quality.' -alpha_q '.$Quality.' -m 6 -mt -quiet "temp/png/'.$pngbase.'" -o "temp/webp/'.$pngfile.'.webp"');
 				}
 				replyUp('Success!', $_POST['reqID'] ?? '');
 				serverMsg(count($SeqFiles).' PNG images were converted to WebP at '.$Quality.' quality'.$cmd, '');
@@ -1046,7 +1046,7 @@ echo'<div id=serverChat>';
 				$duration1st = $duration;
 			}
 			
-			$frames = glob('Temp/webp/'.$sequence.'*.webp');
+			$frames = glob('temp/webp/'.$sequence.'*.webp');
 			$sync=$sync_every;
 			$frames2process = count($frames);
 
@@ -1180,7 +1180,13 @@ echo'<div id=serverChat>';
 				$packName == date("Y-m");
 			}
 			
-			$targetDir = 'packs/'.$packName;
+			$ownerNameFile = '.owner/name.txt';
+			if (file_exists($ownerNameFile))
+				$ownerName = strtolower(trim(file_get_contents($ownerNameFile)));
+			if (isset($ownerName))
+				$targetDir = 'packs/'.$ownerName.'.'.$packName;
+			else
+				$targetDir = 'packs/'.$packName;
 			if (!is_dir($targetDir)) mkdir($targetDir);
 
 			// Move .webp files and sanitize Workshop
@@ -1363,7 +1369,7 @@ echo'<div id=serverChat>';
 			if (file_exists($deviceNameFile)) $deviceName = file_get_contents($deviceNameFile);
 			$publisherFile = '.owner/publisher.txt';
 			if (file_exists($publisherFile)) $publisher = trim(file_get_contents($publisherFile));
-			else $publisher = $ownerName.$deviceName.'WAStks';
+			else $publisher = $ownerName;
 			
 			unset($package);
 			$PublicPacks = glob('packs/*', GLOB_ONLYDIR);
@@ -1380,7 +1386,11 @@ echo'<div id=serverChat>';
 					}
 					$package[$i]=array();
 					$package[$i]['identifier']=$folder;
-					$package[$i]['name']=$folder;
+					$prefixLength = 0;
+					if (isset($ownerName)) $prefixLength = strlen($ownerName) + 1;
+					if ($prefixLength > 0) $folderWithoutPrefix = substr($folder, $prefixLength);
+					else $folderWithoutPrefix = $folder;
+					$package[$i]['name'] = $folderWithoutPrefix;
 					$package[$i]['publisher']=$publisher;
 					$package[$i]['tray_image_file']='_tray.png';
 					$package[$i]['image_data_version']=$image_data_version;
@@ -1420,7 +1430,7 @@ echo'<div id=serverChat>';
 								$package[$i]['stickers'][] = array(
 									'image_file' => $stkbasename,
 									'emojis' => $emojis,
-									'accessibility_text' => $stkfilename.' in '.$folder
+									'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
 								);
 							} else {
 								serverMsg($folder."/".$stkbasename." excluded due to non-compliance: ".$meta[$stkfilename]['noncompliancereason'], "");
@@ -1430,7 +1440,7 @@ echo'<div id=serverChat>';
 								$package[$i]['stickers'][] = array(
 									'image_file' => $stkbasename,
 									'emojis' => $emojis,
-									'accessibility_text' => $stkfilename.' in '.$folder
+									'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
 								);
 							} else {
 								$stkinfo = getStickerInfo($stk);

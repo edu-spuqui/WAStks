@@ -31,6 +31,7 @@ echo'<div class="server-title">';
 	echo'</span>';
 	echo'<span style="display:inline-flex;align-items:center;">';
 	if (!$isOwner) {
+		if (isset($ownerName))	echo '<span id="owner_name" class="hide">'.$ownerName.'</span>';
 		echo '<input id=owner-passwd type="password" autocomplete="off" style="text-align:center;" size=16 placeholder="PASSWORD" />';
 		echo '<button id=owner-login-button title="Login" class="smallButton" onclick="ownerLogin()">▶</button>';
 	} else {
