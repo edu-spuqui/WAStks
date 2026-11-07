@@ -724,13 +724,18 @@ function toggleFolderFilter(folder) {
 				}
 			} else if (folder.startsWith("privatepacks/")) {
 				packName = folder.slice(13);
+			} else if (folder.startsWith("WA-Media/")) {
+				packName = folder.slice(9);
 			} else if (folder.startsWith("User-Media/Stickers/")) {
 				packName = folder.slice(20);
 			}
+			
 			const packNameInput = document.getElementById('PackageName');
 			if (packNameInput) packNameInput.value = packName;
+			
 			const stickerPackNameInput = document.getElementById('stickerPackName');
 			if (stickerPackNameInput) stickerPackNameInput.value = packName;
+			
 			if (StickerCards) StickerCards.forEach( function (stkcard) {
 				let show = false;
 				if (folder=='Favorites') {
@@ -1386,7 +1391,7 @@ function callEmojiPicker(callerID) {
 			//		document.getElementById('stickers').style.display='none';
 			//	}
 			//}
-			//searchInput.focus();
+			if (window.innerWidth > window.innerHeight) searchInput.focus();
 			previouscaller = caller;
 		}
 		else {
@@ -2044,11 +2049,14 @@ function applySignatureTemplate() {
     
     const packInput = form.querySelector('input[name="exif_data[sticker-pack-name]"]');
     const newPackInput = document.getElementById('PackageName');
+    const ownerNameSpan = document.getElementById('owner_name');
+	if (ownerNameSpan) ownerName = ownerNameSpan.innerText.trim().toLowerCase();
     const pubInput = form.querySelector('input[name="exif_data[sticker-pack-publisher]"]');
     const idInput = form.querySelector('input[name="exif_data[sticker-pack-id]"]');
     const accessInput = form.querySelector('input[name="exif_data[accessibility-text]"]');
 
     let packName = "";
+	let packNameShow = "";
     let accessibilityText = "";
 	let workshopAudioSize = "";
 	
@@ -2080,13 +2088,26 @@ function applySignatureTemplate() {
         if (pathPart.includes('packs/')) {
             const parts = pathPart.split('packs/');
             if (parts[1]) packName = parts[1].split('/')[0];
+			if (ownerName) {
+				if (packName.startsWith(ownerName)) {
+					prefixLength = ownerName.length + 1;
+					packNameShow = packName.substring(prefixLength);
+				}
+			}
 			if (packName.substring(0,1)=='_') packName = packName.substring(1);
         }
         
-        if (workshopAudioSize)
-			accessibilityText = `${filePart} in ${packName} with audio (${workshopAudioSize})`;
-		else
-			accessibilityText = `${filePart} in ${packName}`;
+        if (packNameShow) {
+			if (workshopAudioSize)
+				accessibilityText = `${filePart} in ${packNameShow} with audio (${workshopAudioSize})`;
+			else
+				accessibilityText = `${filePart} in ${packNameShow}`;
+		} else {
+			if (workshopAudioSize)
+				accessibilityText = `${filePart} in ${packName} with audio (${workshopAudioSize})`;
+			else
+				accessibilityText = `${filePart} in ${packName}`;
+		}
     }
 	else {
         if (workshopAudioSize)
@@ -2096,18 +2117,28 @@ function applySignatureTemplate() {
 	}
 
     
-    if (packName && !accessibilityText) {
+    if (packName) {
         const unsubbedFilename = filename.replace('.webp', '').replace('_Sub_', '_');
 		
-        if (workshopAudioSize)
-			accessibilityText = `${unsubbedFilename} in ${packName} with audio (${workshopAudioSize})`;
-		else
-			accessibilityText = `${unsubbedFilename} in ${packName}`;
+        if (packNameShow) {
+			if (workshopAudioSize)
+				accessibilityText = `${unsubbedFilename} in ${packNameShow} with audio (${workshopAudioSize})`;
+			else
+				accessibilityText = `${unsubbedFilename} in ${packNameShow}`;
+		} else {
+			if (workshopAudioSize)
+				accessibilityText = `${unsubbedFilename} in ${packName} with audio (${workshopAudioSize})`;
+			else
+				accessibilityText = `${unsubbedFilename} in ${packName}`;
+		}
     }
 
     /* 4. Update the Standard Form Fields */
     if (packName) {
-        if (packInput) packInput.value = packName;
+        if (packInput) {
+			packInput.value = packName;
+			if (packNameShow) packInput.value = packNameShow;
+		}
         if (idInput) idInput.value = `app.spuqui.wastks.stickercontentprovider ${packName}`;
     }
 

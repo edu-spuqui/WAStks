@@ -97,11 +97,12 @@ function checkStickerCompliance($pathfilename) {
 			$stk['CanvasSize'] = $stk['Width'].' x '.$stk['Height'];
 		}
 	}
-	if ( ($stk['CanvasSize']=="512 x 512")&&($stk['FileSize']<="512000")&&($stk['TotalDuration']<="10000") ) {
-		return 1;
-	} else {
-		return 0;
-	}
+	
+	if (	($stk['CanvasSize']=="512 x 512") && 
+			($stk['FileSize']<="512000") && 
+			($stk['TotalDuration']<="10000")
+	)		return 1;
+	else	return 0;
 }
 function getStickerInfo($pathfilename) {
 	unset($stk);
@@ -279,6 +280,10 @@ function renderExifForm($filename) {
     $path = 'workshop/'.$filename.'.webp';
 	$srcPath = 'workshop/'.$filename.'.src';
 	$pubPath = '.owner/publisher.txt';
+
+	$ownerNameFile = '.owner/name.txt';
+	if (file_exists($ownerNameFile))
+		$ownerName = strtolower(trim(file_get_contents($ownerNameFile)));
 	
 	$originPath = file_exists($srcPath) ? trim(file_get_contents($srcPath)) : '';
 	$defaultPublisher = file_exists($pubPath) ? trim(file_get_contents($pubPath)) : 'WAStks';
@@ -286,8 +291,17 @@ function renderExifForm($filename) {
     $sticker = getStickerInfo($path);
     $exif = $sticker['EXIF'] ?? [];
 
-    $packName = $exif['sticker-pack-name'] ?? '';
-    $publisher = $exif['sticker-pack-publisher'] ?? '';
+	if ($originPath) {
+		$folderName = basename(pathinfo($originPath, PATHINFO_DIRNAME));
+		if (isset($ownerName)) {
+			if (str_starts_with($folderName,$ownerName)) {
+				$prefixLength = strlen($ownerName) + 1;
+				$originPackName = substr($folderName,$prefixLength);
+			} else $originPackName = $folderName;
+		} else $originPackName = $folderName;
+	}
+    $packName = $exif['sticker-pack-name'] ?? $originPackName;
+    $publisher = $exif['sticker-pack-publisher'] ?? $defaultPublisher;
     
     /* 1. The "Core 6": Always show these, even if empty */
     $standardKeys = [
@@ -1370,7 +1384,8 @@ echo'<div id=serverChat>';
 			$publisherFile = '.owner/publisher.txt';
 			if (file_exists($publisherFile)) $publisher = trim(file_get_contents($publisherFile));
 			else $publisher = $ownerName;
-			
+
+			// Prepare Public Packages
 			unset($package);
 			$PublicPacks = glob('packs/*', GLOB_ONLYDIR);
 			rsort($PublicPacks);
@@ -1427,21 +1442,29 @@ echo'<div id=serverChat>';
 						// Check if sticker is compliant
 						if (isset($meta[$stkfilename]['compliance'])) {
 							if ($meta[$stkfilename]['compliance']) {
-								$package[$i]['stickers'][] = array(
-									'image_file' => $stkbasename,
-									'emojis' => $emojis,
-									'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
-								);
+								if (!empty($emojis)) {
+									$package[$i]['stickers'][] = array(
+										'image_file' => $stkbasename,
+										'emojis' => $emojis,
+										'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
+									);
+								} else {
+									serverMsg($folder."/".$stkbasename." excluded due to lack of emojis.", "");
+								}
 							} else {
 								serverMsg($folder."/".$stkbasename." excluded due to non-compliance: ".$meta[$stkfilename]['noncompliancereason'], "");
 							}
 						} else {
 							if (checkStickerCompliance($stk)) {
-								$package[$i]['stickers'][] = array(
-									'image_file' => $stkbasename,
-									'emojis' => $emojis,
-									'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
-								);
+								if (!empty($emojis)) {
+									$package[$i]['stickers'][] = array(
+										'image_file' => $stkbasename,
+										'emojis' => $emojis,
+										'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
+									);
+								} else {
+									serverMsg($folder."/".$stkbasename." excluded due to lack of emojis.", "");
+								}
 							} else {
 								$stkinfo = getStickerInfo($stk);
 								if ($stkinfo['CanvasSize']!="512 x 512")
@@ -1450,12 +1473,13 @@ echo'<div id=serverChat>';
 									serverMsg($folder."/".$stkbasename." excluded due to non-compliance in File Size: ".$stkinfo['FileSize'], "");
 								if ($stkinfo['TotalDuration']>"10000")
 									serverMsg($folder."/".$stkbasename." excluded due to non-compliance in Total Duration: ".$stkinfo['TotalDuration'], "");
+								if (empty($emojis))
+									serverMsg($folder."/".$stkbasename." excluded due to lack of emojis.", "");
 							}
 						}
 					}
 				}
 			}
-			$androidMediaBase = '/storage/emulated/0/Android/media';
 			if (isset($package)) {
 				$output=array();
 				$output['android_play_store_link']="https://play.google.com/store/apps/details?id=app.spuqui.wastks";
@@ -1464,44 +1488,16 @@ echo'<div id=serverChat>';
 				if ($f=fopen('packs/contents.json', 'w')) {
 					fwrite($f, $outputJSON);
 					fclose($f);
-					if (!is_dir($androidMediaBase)) {
-						serverMsg('Public Packs processed.', $_POST['reqID']);
-					}
+					serverMsg('Public Packs processed.', $_POST['reqID']);
 				}
 			} else {
 				if (file_exists('packs/contents.json')) {
 					unlink('packs/contents.json');
 				}
-				replyUp('No Public Packs to process.', $_POST['reqID']);
+				serverMsg('No Public Packs to process.', $_POST['reqID']);
 			}
 
-			$appFolder = $androidMediaBase . '/app.spuqui.wastks';
-			$targetPacks = $appFolder . '/packs';
-			$sourcePacks = 'packs/';				// Local folder in ~/WAStks/
-
-			// Check if we are on an Android device with Media storage access
-			if (is_dir($androidMediaBase)) {
-				if (!is_dir($appFolder)) mkdir($appFolder, 0755, true);
-				if (!is_dir($targetPacks)) mkdir($targetPacks, 0755, true);
-
-				// Synchronize Files
-				// Using rsync if available is faster, otherwise fallback to shell copy
-				// -a: archive, -u: update (only newer), -r: recursive
-				$cmd = "rsync -a --delete \"$sourcePacks\" \"$targetPacks/\" 2>&1";
-				exec($cmd, $output, $returnVar);
-
-				if ($returnVar !== 0) {
-					// Fallback: If rsync isn't in the environment, use standard cp
-					$cmd = "rm -rf \"$targetPacks/\"* && cp -r \"$sourcePacks\"* \"$targetPacks/\" 2>&1";
-					exec($cmd, $output, $returnVar);
-				}
-
-				if ($returnVar === 0) {
-					// Success logging
-					serverMsg('Public packs processed and deployed.', $_POST['reqID']);
-				}
-			}
-			
+			// Prepare Private Packages
 			unset($package);
 			$PrivatePacks = glob('privatepacks/*', GLOB_ONLYDIR);
 			rsort($PrivatePacks);
@@ -1554,21 +1550,29 @@ echo'<div id=serverChat>';
 						// Check if sticker is compliant
 						if (isset($meta[$stkfilename]['compliance'])) {
 							if ($meta[$stkfilename]['compliance']) {
-								$package[$i]['stickers'][] = array(
-									'image_file' => $stkbasename,
-									'emojis' => $emojis,
-									'accessibility_text' => $stkfilename.' in '.$folder
-								);
+								if (!empty($emojis)) {
+									$package[$i]['stickers'][] = array(
+										'image_file' => $stkbasename,
+										'emojis' => $emojis,
+										'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
+									);
+								} else {
+									serverMsg($folder."/".$stkbasename." excluded due to lack of emojis.", "");
+								}
 							} else {
 								serverMsg($folder."/".$stkbasename." excluded due to non-compliance: ".$meta[$stkfilename]['noncompliancereason'], "");
 							}
 						} else {
 							if (checkStickerCompliance($stk)) {
-								$package[$i]['stickers'][] = array(
-									'image_file' => $stkbasename,
-									'emojis' => $emojis,
-									'accessibility_text' => $stkfilename.' in '.$folder
-								);
+								if (!empty($emojis)) {
+									$package[$i]['stickers'][] = array(
+										'image_file' => $stkbasename,
+										'emojis' => $emojis,
+										'accessibility_text' => $stkfilename.' in '.$folderWithoutPrefix
+									);
+								} else {
+									serverMsg($folder."/".$stkbasename." excluded due to lack of emojis.", "");
+								}
 							} else {
 								$stkinfo = getStickerInfo($stk);
 								if ($stkinfo['CanvasSize']!="512 x 512")
@@ -1577,13 +1581,13 @@ echo'<div id=serverChat>';
 									serverMsg($folder."/".$stkbasename." excluded due to non-compliance in File Size: ".$stkinfo['FileSize'], "");
 								if ($stkinfo['TotalDuration']>"10000")
 									serverMsg($folder."/".$stkbasename." excluded due to non-compliance in Total Duration: ".$stkinfo['TotalDuration'], "");
+								if (empty($emojis))
+									serverMsg($folder."/".$stkbasename." excluded due to lack of emojis.", "");
 							}
 						}
 					}
 				}
 			}
-			
-			$androidMediaBase = '/storage/emulated/0/Android/media';
 			if (isset($package)) {
 				$output=array();
 				$output['android_play_store_link']="https://play.google.com/store/apps/details?id=app.spuqui.wastks";
@@ -1593,28 +1597,46 @@ echo'<div id=serverChat>';
 				if ($f=fopen('privatepacks/contents.json', 'w')) {
 					fwrite($f, $outputJSON);
 					fclose($f);
-					if (!is_dir($androidMediaBase)) {
-						replyUp('Private Packs processed.', $_POST['reqID']);
-					}
+					serverMsg('Private Packs processed.', $_POST['reqID']);
 				}
 			} else {
 				if (file_exists('privatepacks/contents.json')) {
 					unlink('privatepacks/contents.json');
 				}
-				replyUp('No Private Packs to process.', $_POST['reqID']);
+				serverMsg('No Private Packs to process.', $_POST['reqID']);
 			}
+
+			// Deploy to Android app if in Android
+			$androidMediaBase = '/storage/emulated/0/Android/media';
 			$appFolder = $androidMediaBase . '/app.spuqui.wastks';
-			$targetPrivatePacks = $appFolder . '/privatepacks';
+			$sourcePacks = 'packs/';				// Local folder in ~/WAStks/
 			$sourcePrivatePacks = 'privatepacks/';	// Local folder in ~/WAStks/
+			$targetPacks = $appFolder . '/' . strtolower($ownerName);
+			$targetPrivatePacks = $appFolder . '/' . strtolower($ownerName) . 'private';
 
 			// Check if we are on an Android device with Media storage access
 			if (is_dir($androidMediaBase)) {
 				if (!is_dir($appFolder)) mkdir($appFolder, 0755, true);
+				if (!is_dir($targetPacks)) mkdir($targetPacks, 0755, true);
 				if (!is_dir($targetPrivatePacks)) mkdir($targetPrivatePacks, 0755, true);
 
 				// Synchronize Files
 				// Using rsync if available is faster, otherwise fallback to shell copy
 				// -a: archive, -u: update (only newer), -r: recursive
+				$cmd = "rsync -a --delete \"$sourcePacks\" \"$targetPacks/\" 2>&1";
+				exec($cmd, $output, $returnVar);
+
+				if ($returnVar !== 0) {
+					// Fallback: If rsync isn't in the environment, use standard cp
+					$cmd = "rm -rf \"$targetPacks/\"* && cp -r \"$sourcePacks\"* \"$targetPacks/\" 2>&1";
+					exec($cmd, $output, $returnVar);
+				}
+
+				if ($returnVar === 0) {
+					// Success logging
+					serverMsg('Public packs deployed.', $_POST['reqID']);
+				}
+
 				$cmd = "rsync -a --delete \"$sourcePrivatePacks\" \"$targetPrivatePacks/\" 2>&1";
 				exec($cmd, $output, $returnVar);
 
@@ -1626,7 +1648,7 @@ echo'<div id=serverChat>';
 
 				if ($returnVar === 0) {
 					// Success logging
-					replyUp('Private packs processed and deployed.', $_POST['reqID']);
+					replyUp('Private packs deployed.', $_POST['reqID']);
 				}
 
 			}
