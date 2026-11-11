@@ -10,6 +10,8 @@ printf "%s" "$owner_name" > ~/wastks/WAStks/.owner/name.txt
 read -s -p "Choose your password, $owner_name: " owner_token
 echo ""
 printf "%s" "$owner_token" > ~/wastks/WAStks/.owner/token.txt
+htpasswd -b -c ~/wastks/.htpasswd "admin" "$owner_token"
+chmod 644 ~/wastks/.htpasswd
 echo ""
 read -p "Choose a name for this device: " device_name
 if [ -n "$device_name" ]; then
