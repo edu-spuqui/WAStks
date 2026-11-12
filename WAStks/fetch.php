@@ -989,6 +989,30 @@ echo'<div id=serverChat>';
 				include 'imgseq.php';
 			echo'</div>';
 		}
+		if (isset($_POST['BackToPng'])) {
+			$SeqName = $_POST['BackToPng'];
+			
+			$SeqFiles = glob('temp/webp/'.$SeqName.'*.webp');
+			if (count($SeqFiles)==1) {
+				// Static Sticker
+				$webp = pathinfo($SeqFiles[0]);
+				$cmd = shell_exec('dwebp "temp/webp/'.$webp['basename'].'" -o "temp/png/'.$webp['filename'].'.png"');
+				replyUp('Success!', $_POST['reqID'] ?? '');
+				serverMsg('Static Sticker reverted to PNG '.$cmd, '');
+			} else {
+				// Animated Sticker
+				forEach($SeqFiles as $webp) {
+					$webpbase = basename($webp);
+					$webpfile = basename($webpbase, '.webp');
+					shell_exec('dwebp "temp/webp/'.$webpbase.'" -o "temp/png/'.$webpfile.'.png"');
+				}
+				replyUp('Success!', $_POST['reqID'] ?? '');
+				serverMsg(count($SeqFiles).' WebP images were converted to PNG.', '');
+			}
+			echo'<div id=imgseq>';
+				include 'imgseq.php';
+			echo'</div>';
+		}
 		if (isset($_POST['Convert2WebP'])) {
 			$SeqName = $_POST['Convert2WebP'];
 			$Quality = $_REQUEST['Quality'];
@@ -1362,10 +1386,27 @@ echo'<div id=serverChat>';
 				$sourcePath = 'workshop/'.$filename.'.src';
 				if (file_exists($sourcePath)) $source = trim(file_get_contents($sourcePath));
 				if (file_exists($source)) {
-					if (copy('workshop/'.$filename.'.webp', $source))
-						replyUp('Updated '.$source, $_POST['reqID']);
-					else
-						replyDown('Failed to update '.$source, $_POST['reqID']);
+					$sourceFilename = basename($source,'.webp');
+					if ($sourceFilename==$filename) {
+						if (copy('workshop/'.$filename.'.webp', $source))
+							replyUp('Updated '.$source, $_POST['reqID']);
+						else
+							replyDown('Failed to update '.$source, $_POST['reqID']);
+					} else {
+						$sourceRealPath = pathinfo($source, PATHINFO_DIRNAME);
+						$oldSource = $sourceRealPath.'/'.$sourceFilename.'.webp';
+						$oldSourceAudio = $sourceRealPath.'/'.$sourceFilename.'.aac';
+						$newSource = $sourceRealPath.'/'.$filename.'.webp';
+						$newSourceAudio = $sourceRealPath.'/'.$filename.'.aac';
+						if (file_exists($oldSource)) unlink($oldSource);
+						if (file_exists($oldSourceAudio)) unlink($oldSourceAudio);
+						if (file_exists('workshop/'.$filename.'.aac'))
+							copy('workshop/'.$filename.'.aac', $newSourceAudio);
+						if (copy('workshop/'.$filename.'.webp', $newSource))
+							replyUp('Updated '.$newSource, $_POST['reqID']);
+						else
+							replyDown('Failed to update '.$newSource, $_POST['reqID']);
+					}
 				}
 			}
 		}
@@ -1758,6 +1799,47 @@ echo'<div id=serverChat>';
 					}
 				}
 				replyUp($count." broken favorites removed.", $_POST['reqID'] ?? '');
+			}
+		}
+		if (isset($_POST['Rename'])) {
+			$shortname = $_POST['Rename'];
+			$renameto = $_REQUEST['renameto'];
+			$audio = $_REQUEST['audio'];
+			$emojis = $_REQUEST['emojis'];
+			$log = $_REQUEST['log'];
+			
+			$jsonPath = 'metadata.json';
+			$metadata = file_exists($jsonPath) ? json_decode(file_get_contents($jsonPath), true) : [];
+
+			$oldKey = $shortname;
+			$newKey = $renameto;
+
+			if ( rename('workshop/'.$shortname.'.webp','workshop/'.$renameto.'.webp') ) {
+				if (file_exists('workshop/'.$shortname.'.src'))
+					rename('workshop/'.$shortname.'.src','workshop/'.$renameto.'.src');
+				if ( $audio == 'true' ) {
+					rename('workshop/'.$shortname.'.aac','workshop/'.$renameto.'.aac');
+				}
+				if ( $emojis == 'true' ) {
+					// Check if the record exists under the old key
+					if (isset($metadata[$oldKey])) {
+						// 1. Copy the data to the new key and remove the old key
+						$metadata[$newKey] = $metadata[$oldKey];
+						unset($metadata[$oldKey]);
+
+						// 2. Save the updated metadata back to metadata.json
+						file_put_contents(
+							$jsonPath, 
+							json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+						);
+					}
+				}
+				if ( $log == 'true' ) {
+					rename('Logs/'.$shortname.'.log','Logs/'.$renameto.'.log');
+				}
+				replyUp($shortname.' renamed to '.$renameto.' audio:'.$audio.' emojis:'.$emojis.' log:'.$log, $_POST['reqID']);
+			} else {
+				replyDown('Failed to rename '.$shortname.' to '.$renameto, $_POST['reqID']);
 			}
 		}
 	}

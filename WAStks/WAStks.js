@@ -286,10 +286,26 @@ async function preparePost(data, command, reference, reqID) {
 		if (emoji3)	data.append('emoji3', emoji3.innerText);
 
 	}
+	else if (command=='Rename') {
+		const index = document.getElementById('workshop'+reference).value;
+		const renameto = document.getElementById(index+'renameto').value;
+		const audio = document.getElementById(index+'audio').checked;
+		const emojis = document.getElementById(index+'emojis').checked;
+		const log = document.getElementById(index+'log').checked;
+		const timestamp = getTimestamp();
+		data.append('renameto', renameto);
+		data.append('audio', audio);
+		data.append('emojis', emojis);
+		data.append('log', log);
+		console.log(timestamp+' Rename '+reference+' to '+renameto+' audio:'+audio+' emojis:'+emojis+' log:'+log);
+	}
 	else if (command=='Refresh') { if (reference=='Manifest') goToPage('serverChatPage'); }
 	else if (command=='Update') goToPage('serverChatPage');
 	else if (command=='Prepare') { goToPage('serverChatPage'); }
 	else if (command=='Clean') { goToPage('serverChatPage'); }
+	else if ((command=='zrokShare')||(command=='zrokStop')) {
+		document.getElementById('serverChatPage').scrollIntoView({ behavior: 'smooth' });
+	}
 	else if (command == 'LinkRemote') {
 		try {
 			const urlObj = new URL(reference);
@@ -414,14 +430,14 @@ async function postSuccessful(parsedResponse, command, reference, reqID) {
 		await updateDiv(parsedResponse, 'workshop');
 		const PackageNameInput = document.getElementById("PackageName");
 		const stickerPackName = document.getElementById("stickerPackName");
-		if (stickerPackName.value) PackageNameInput.value = stickerPackName.value;
+		if (stickerPackName && PackageNameInput) PackageNameInput.value = stickerPackName.value;
 		document.getElementById('workshopPage').scrollIntoView({ behavior: 'smooth' });
 	}
 	else if (command=='LinkRemote') {
 		await updateDiv(parsedResponse, 'workshop');
 		const PackageNameInput = document.getElementById('PackageName');
 		const stickerPackName = document.getElementById('stickerPackName');
-		if (stickerPackName.value) PackageNameInput.value = stickerPackName.value;
+		if (stickerPackName && PackageNameInput) PackageNameInput.value = stickerPackName.value;
 		document.getElementById('workshopPage').scrollIntoView({ behavior: 'smooth' });
 		const basename = reference.split('/').pop();
 		const filename = basename.replace('.webp', '');
@@ -444,6 +460,7 @@ async function postSuccessful(parsedResponse, command, reference, reqID) {
 		}
 	}
 	else if (command=='Unlink') {		updateDiv(parsedResponse, 'workshop'); }
+	else if (command=='BackToPng') {	updateDiv(parsedResponse, 'imgseq'); document.getElementById('serverChatPage').scrollIntoView({ behavior: 'smooth' }); }
 	else if (command=='Disassemble') {	updateDiv(parsedResponse, 'imgseq'); document.getElementById('serverChatPage').scrollIntoView({ behavior: 'smooth' }); }
 	else if (command=='Assemble') {		updateDiv(parsedResponse, 'workshop'); document.getElementById('workshopPage').scrollIntoView({ behavior: 'smooth' }); }
 	else if (command=='Convert2WebP') {
@@ -2194,6 +2211,14 @@ function updateSignature(filename) {
 	.catch(error => { 
 		console.error('Workshop Update Failed:', error);
 	});
+}
+function toggleRenaming(filename) {
+	const div = document.getElementById(filename+'renaming');
+	const tog = document.getElementById(filename+'renametoggle');
+	const input = document.getElementById(filename+'renameto');
+	if (tog) tog.classList.toggle('toggled');
+	if (div) div.classList.toggle('softhide');
+	if (input) input.focus();
 }
 
 function togglePhone(filename) {

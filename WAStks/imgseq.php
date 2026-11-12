@@ -181,8 +181,8 @@ $webpFiles = glob('temp/webp/*.webp');
 				echo'<div id="'.$i.'ImgSeq" style="scroll-snap-align:start;">';
 					echo'<input type=hidden id="ImgSeq'.$sequence.'" value="'.$i.'" />';
 					
-					echo'<div class="flex space-between" style="height:5vh;">';
-						echo'<div class="flex aligncenter space-between" style="width:calc(100% - 5vh); gap:1vh;">';
+					echo'<div class="flex space-between" style="height:4.4vh;">';
+						echo'<div class="flex aligncenter space-between" style="width:calc(100% - 4.4vh); gap:0.4vh;">';
 							// Image Sequence Name
 							echo '<span class="imgseqname">'.$sequence.'</span>';
 
@@ -273,7 +273,7 @@ $webpFiles = glob('temp/webp/*.webp');
 
 					echo'</div>';
 					
-					echo'<div class="flex aligncenter">';
+					echo'<div class="flex aligncenter" style="gap:0vh;margin:0vh;padding:0vh;">';
 						// PNG section
 						if (isset($Sequences[$sequence]['pngsize'])) {
 							echo'<button title="Delete PNGs" onclick="post(\'DeletePNGSequence\', \''.$sequence.'\')">🗑</button>';
@@ -283,26 +283,27 @@ $webpFiles = glob('temp/webp/*.webp');
 								} else {
 									echo'<input id="Quality_'.$i.'" title="Quality" type="number" class="biginput" min="0" max="100" value="20" />'.PHP_EOL;
 								}
-								echo'<button class="bigbutton" title="PNGs to WebPs" onclick="post(\'Convert2WebP\', \''.$sequence.'\')">➡</button>'.PHP_EOL;
+								echo'<button title="PNGs to WebPs" onclick="post(\'Convert2WebP\', \''.$sequence.'\')">➡</button>'.PHP_EOL;
 							} else {
 								if (isset($_COOKIE['Quality'])) {
 									echo'<input id="Quality_'.$i.'" title="Quality" type="number" class="biginput" min="0" max="100" value="'.$_COOKIE['Quality'].'" />'.PHP_EOL;
 								} else {
 									echo'<input id="Quality_'.$i.'" title="Quality" type="number" class="biginput" min="0" max="100" value="20" />'.PHP_EOL;
 								}
-								echo'<button class="bigbutton" title="Create Static Sticker" onclick="post(\'Convert2WebP\', \''.$sequence.'\')">➡</button>'.PHP_EOL;
+								echo'<button title="Create Static Sticker" onclick="post(\'Convert2WebP\', \''.$sequence.'\')">➡</button>'.PHP_EOL;
 							}
 						}
 						// WebP section
 						if (isset($Sequences[$sequence]['webpsize'])) {
 							echo'<button title="Delete WebPs" onclick="post(\'DeleteWebPSequence\', \''.$sequence.'\')">🗑</button>';
+							echo'<button title="BackToPng" onclick="post(\'BackToPng\', \''.$sequence.'\')">⬅</button>'.PHP_EOL;
 							
 							if ($Sequences[$sequence]['webpsize'] <= 512000) {
-								echo '<span class=official style="font-size:2.2vh;">'.number_format($Sequences[$sequence]['webpsize']).' bytes</span>'.PHP_EOL;
+								echo '<span class=official style="font-size:2.2vmin;">'.number_format($Sequences[$sequence]['webpsize']).' bytes</span>'.PHP_EOL;
 							} else if ($Sequences[$sequence]['webpsize'] <= 1048576) {
-								echo '<span class=unofficial style="font-size:2.2vh;">'.number_format($Sequences[$sequence]['webpsize']).' bytes</span>'.PHP_EOL;
+								echo '<span class=unofficial style="font-size:2.2vmin;">'.number_format($Sequences[$sequence]['webpsize']).' bytes</span>'.PHP_EOL;
 							} else {
-								echo '<span class=overlimit style="font-size:2.2vh;">'.number_format($Sequences[$sequence]['webpsize']).' bytes</span>'.PHP_EOL;
+								echo '<span class=overlimit style="font-size:2.2vmin;">'.number_format($Sequences[$sequence]['webpsize']).' bytes</span>'.PHP_EOL;
 							}
 
 							// FFD

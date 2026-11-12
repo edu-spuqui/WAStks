@@ -167,6 +167,8 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 					echo'</span>';
 				echo'</div>';
 
+				buildRenaming($i,$sticker);
+				
 				echo PHP_EOL.'<div class=bothbgs>';
 					echo'<div class="background-color">';
 						echo'<img title="'.$sticker['filename'].'" id=workshop'.$i.'img src="'.$sticker['dirname'].'/'.$sticker['filename'].'.webp'.'">';
@@ -195,10 +197,7 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 					else														echo '<button onclick="post(\'ToggleFav\', \''.$sticker['filename'].'\')" title="Add to Favorites" style="opacity:0.33;">❤</button>';
 				}
 				echo '<button title="Unlink '.$sticker['filename'].'" onclick="post(\'Unlink\', \''.$sticker['filename'].'\')" class="emoji">⛓️‍💥</button>'.PHP_EOL;
-				if (isset($sticker['source'])) {
-					if (!str_starts_with($sticker['source'], 'WA-Media'))
-						echo '<button onclick="post(\'Update\', \''.$sticker['filename'].'\')" title="Update Source">💾</button>';
-				}
+				echo '<button title="Rename '.$sticker['filename'].'" id='.$sticker['filename'].'renametoggle onclick="toggleRenaming(\''.$sticker['filename'].'\')">📛</button>'.PHP_EOL;
 				echo '<button title="ToggleSign '.$sticker['filename'].'" onclick="toggleSignature(\''.$sticker['filename'].'\')">✒</button>';
 				
 				echo '<button title="Create Tray Icon" onclick="post(\'CreateTrayIcon\', \''.$sticker['filename'].'\')">🦄</button>';
@@ -209,12 +208,47 @@ function buildWorkshopStickerCard($i,$stickerscount,$sticker) {
 				}
 				
 				if ($sticker['TotalDuration'] > 0) echo '<button title="Disassemble '.$sticker['filename'].'" onclick="post(\'Disassemble\', \''.$sticker['filename'].'\')" class="emoji">⬅</button>';
+				if (isset($sticker['source'])) {
+					if (!str_starts_with($sticker['source'], 'WA-Media'))
+						echo '<button onclick="post(\'Update\', \''.$sticker['filename'].'\')" title="Update Source">💾</button>';
+				}
 
 			}
 			echo'</div>';
 
 		echo'</div>';
 	echo'</div>'.PHP_EOL;
+}
+function buildRenaming($i,$sticker) {
+	echo'<div id="'.$sticker['filename'].'renaming" class="renaming softhide">';
+	{	// Renaming
+		echo'Rename '.$sticker['filename'].' to:<br>';
+		echo'<input id="'.$sticker['filename'].'renameto" value="'.$sticker['filename'].'" size=36 /><br>';
+		echo'Also rename: <br>';
+		if (file_exists('workshop/'.$sticker['filename'].'.aac')) {
+			echo'<input id="'.$sticker['filename'].'audio" type=checkbox checked />';
+			echo'<label for="'.$sticker['filename'].'audio">Audio</label> ';
+		} else {
+			echo'<input id="'.$sticker['filename'].'audio" type=checkbox disabled />';
+			echo'<label for="'.$sticker['filename'].'audio">Audio</label> ';
+		}
+		if (!empty(array_filter($sticker['emojis']))) {
+			echo'<input id="'.$sticker['filename'].'emojis" type=checkbox checked />';
+			echo'<label for="'.$sticker['filename'].'emojis">Emojis</label> ';
+		} else {
+			echo'<input id="'.$sticker['filename'].'emojis" type=checkbox disabled />';
+			echo'<label for="'.$sticker['filename'].'emojis">Emojis</label> ';
+		}
+		if (file_exists('logs/'.$sticker['filename'].'.log')) {
+			echo'<input id="'.$sticker['filename'].'log" type=checkbox checked />';
+			echo'<label for="'.$sticker['filename'].'log">Log</label> ';
+		} else {
+			echo'<input id="'.$sticker['filename'].'log" type=checkbox disabled />';
+			echo'<label for="'.$sticker['filename'].'log">Log</label> ';
+		}
+		echo '<button title="Rename" onclick="post(\'Rename\', \''.$sticker['filename'].'\')" style="position:absolute;bottom:8px;right:8px;">📛</button>'.PHP_EOL;
+	}
+	echo'</div>';
 }
 
 //unset($sourceStickers);
