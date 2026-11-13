@@ -280,14 +280,14 @@ echo'<div id=owner-server-content>';
 
 		foreach($allFolders as $folderpath => $count) {
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private')  && !str_starts_with($folderpath, 'WA-Media')) {
 				$publicFolders[$folderpath] = $count;
 			}
 		}
 		foreach($allStickers as $stk) {
 			$folderpath = $stk['dirname'];
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private')  && !str_starts_with($folderpath, 'WA-Media')) {
 				$publicStickers[] = $stk;
 			}
 		}
@@ -325,14 +325,14 @@ echo'<div id=owner-server-content>';
 
 		foreach($allFolders as $folderpath => $count) {
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private')  && !str_starts_with($folderpath, 'WA-Media')) {
 				$publicFolders[$folderpath] = $count;
 			}
 		}
 		foreach($allStickers as $stk) {
 			$folderpath = $stk['dirname'];
 			$foldername = basename($folderpath);
-			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private') ) {
+			if ( !str_starts_with($foldername, '_') && !str_starts_with($folderpath, 'private')  && !str_starts_with($folderpath, 'WA-Media')) {
 				$publicStickers[] = $stk;
 			}
 		}

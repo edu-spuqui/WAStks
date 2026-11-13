@@ -38,6 +38,15 @@ if [ -f "$HOME/wastks/termux-php.ini" ]; then
 	echo - Adding php.ini config file...
 	mkdir -p $PREFIX/etc/php
 	mv -f ~/wastks/termux-php.ini $PREFIX/etc/php/php.ini
+	system_timezone=$(getprop persist.sys.timezone)
+    if [ -z "$system_timezone" ]; then
+        system_timezone="UTC"
+    fi
+    if grep -q "^date.timezone" "$PREFIX/etc/php/php.ini"; then
+        sed -i "s|^date.timezone[[:space:]]*=.*|date.timezone = $system_timezone|" "$PREFIX/etc/php/php.ini"
+    else
+        sed -i "1i date.timezone = $system_timezone" "$PREFIX/etc/php/php.ini"
+    fi
 fi
 if [ ! -e "$HOME/wastks/WAStks/.owner" ]; then
 	bash ~/wastks/config-wastks.sh

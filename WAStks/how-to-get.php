@@ -17,7 +17,7 @@ How to install the WAStks tool on Android:<br>
 </ul>
 Extra installation steps if you want to share your stickers on the internet:<br>
 <ul>
-	<li>On Termux, run commands:</li>
+	<li>On Termux, run command:</li>
 	<ul>
 		<li><a class="commands" onclick="navigator.clipboard.writeText('zrok invite')">zrok invite</a></li> (this will open another window where you will have to type your e-mail address twice to send it the invitation)
 	</ul>

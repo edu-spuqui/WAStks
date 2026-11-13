@@ -2218,7 +2218,17 @@ function toggleRenaming(filename) {
 	const input = document.getElementById(filename+'renameto');
 	if (tog) tog.classList.toggle('toggled');
 	if (div) div.classList.toggle('softhide');
-	if (input) input.focus();
+	if (input) {
+		if (tog.classList.contains('toggled'))
+			setTimeout(() => {input.focus();}, 10);
+		else
+			setTimeout(() => {
+				document.getElementById('view-pager').focus();
+				if (window.innerWidth < window.innerHeight) {
+					showStickers();
+				}
+			}, 10);
+	}
 }
 
 function togglePhone(filename) {
@@ -2326,14 +2336,34 @@ window.onload = async function() {
 	else await buildEmojisFrom('emojis-latest.json');
 	document.getElementById('searchInput').addEventListener("input", updateVisible);
 
-	document.getElementById('view-pager').addEventListener('focusin', function(e) {
-		// Target any input that isn't the search bar
+	const viewPager = document.getElementById('view-pager');
+
+	// 1. Hide stickers when any valid input inside view-pager gains focus
+	viewPager.addEventListener('focusin', function(e) {
 		if (e.target.tagName === 'INPUT' && e.target.id !== 'searchInput') {
 			if (window.innerWidth < window.innerHeight) {
-				document.getElementById('stickers').style.display = 'none';
+				hideStickers();
 			}
 		}
 	});
+
+	// 2. Restore stickers when an input inside view-pager loses focus (clicks away to background)
+	viewPager.addEventListener('focusout', function(e) {
+		if (e.target.tagName === 'INPUT' && e.target.id !== 'searchInput') {
+			// Small timeout ensures that if focus just shifted to *another* input 
+			// inside view-pager, we don't flash the stickers open and closed immediately.
+			setTimeout(() => {
+				const activeElem = document.activeElement;
+				// If active element is no longer an input inside view-pager, user clicked away
+				if (!viewPager.contains(activeElem) || activeElem.tagName !== 'INPUT') {
+					if (window.innerWidth < window.innerHeight) {
+						showStickers();
+					}
+				}
+			}, 100);
+		}
+	});
+
 	document.addEventListener('dragstart', function(e) {
 		// Explicitly targeting only elements with this class
 		if (e.target.classList.contains('audio-draggable')) {

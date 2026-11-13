@@ -597,7 +597,7 @@ a:visited { 		color:				rgba(var(--custom-green), 1); }
 }
 #PackageName {	max-width:			16ch;}
 .renaming {
-	position:			fixed;
+	position:			absolute;
 	right:				5vh;
 	margin-top:			0vh;
 
@@ -1413,7 +1413,7 @@ a:visited { 		color:				rgba(var(--custom-green), 1); }
     margin-bottom: 0.4vh;
 }
 .EXIF-key input {
-    width: 100%;
+    width: 95%;
     background: rgba(var(--background-sysinput), 1);
     border: 0.1vh solid rgba(var(--color), 0.1);
     border-radius: 0.8vh;

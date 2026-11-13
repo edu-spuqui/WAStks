@@ -1661,38 +1661,40 @@ echo'<div id=serverChat>';
 				if (!is_dir($targetPacks)) mkdir($targetPacks, 0755, true);
 				if (!is_dir($targetPrivatePacks)) mkdir($targetPrivatePacks, 0755, true);
 
-				// Synchronize Files
-				// Using rsync if available is faster, otherwise fallback to shell copy
-				// -a: archive, -u: update (only newer), -r: recursive
-				$cmd = "rsync -a --delete \"$sourcePacks\" \"$targetPacks/\" 2>&1";
-				exec($cmd, $output, $returnVar);
-
-				if ($returnVar !== 0) {
-					// Fallback: If rsync isn't in the environment, use standard cp
-					$cmd = "rm -rf \"$targetPacks/\"* && cp -r \"$sourcePacks\"* \"$targetPacks/\" 2>&1";
+				if (count($PublicPacks)) {
+					// Synchronize Files
+					// Using rsync if available is faster, otherwise fallback to shell copy
+					// -a: archive, -u: update (only newer), -r: recursive
+					$cmd = "rsync -a --delete \"$sourcePacks\" \"$targetPacks/\" 2>&1";
 					exec($cmd, $output, $returnVar);
-				}
 
-				if ($returnVar === 0) {
-					// Success logging
-					serverMsg('Public packs deployed.', $_POST['reqID']);
-				}
+					if ($returnVar !== 0) {
+						// Fallback: If rsync isn't in the environment, use standard cp
+						$cmd = "rm -rf \"$targetPacks/\"* && cp -r \"$sourcePacks\"* \"$targetPacks/\" 2>&1";
+						exec($cmd, $output, $returnVar);
+					}
 
-				$cmd = "rsync -a --delete \"$sourcePrivatePacks\" \"$targetPrivatePacks/\" 2>&1";
-				exec($cmd, $output, $returnVar);
-
-				if ($returnVar !== 0) {
-					// Fallback: If rsync isn't in the environment, use standard cp
-					$cmd = "rm -rf \"$targetPrivatePacks/\"* && cp -r \"$sourcePrivatePacks\"* \"$targetPrivatePacks/\" 2>&1";
+					if ($returnVar === 0) {
+						// Success logging
+						serverMsg('Public packs deployed.', $_POST['reqID']);
+					}
+				} else serverMsg('No public packs to deploy.', $_POST['reqID']);
+				if (count($PrivatePacks)) {
+					$cmd = "rsync -a --delete \"$sourcePrivatePacks\" \"$targetPrivatePacks/\" 2>&1";
 					exec($cmd, $output, $returnVar);
-				}
 
-				if ($returnVar === 0) {
-					// Success logging
-					replyUp('Private packs deployed.', $_POST['reqID']);
-				}
+					if ($returnVar !== 0) {
+						// Fallback: If rsync isn't in the environment, use standard cp
+						$cmd = "rm -rf \"$targetPrivatePacks/\"* && cp -r \"$sourcePrivatePacks\"* \"$targetPrivatePacks/\" 2>&1";
+						exec($cmd, $output, $returnVar);
+					}
 
-			}
+					if ($returnVar === 0) {
+						// Success logging
+						replyUp('Private packs deployed.', $_POST['reqID']);
+					}
+				} else replyUp('No private packs to deploy.', $_POST['reqID']);
+			} else replyUp('No deployment since not in Android.', $_POST['reqID']);
 
 		}
 		if (isset($_POST['zrokShare'])) {
