@@ -615,21 +615,40 @@ echo'<div id=owner-server-content>';
 	$translateEmojis = 0;
 	if ($translateEmojis) {
 		echo '<br>';
+		// translate Emojis json to another language
+		$language = 'PT';
+		$emojisLanguageV17 = [];
+		
 		// load emojis in English
 		if (file_exists('emojis-latest.json')) {
 			$emojisENcoded = file_get_contents('emojis-latest.json');
 			$emojisEN = json_decode($emojisENcoded, true);
 			echo 'Loaded emojis in English<br>';
-			if (file_exists('ES.annotations.json')) {
-				$annotationsEScoded = file_get_contents('ES.annotations.json');
-				$annotationsES = json_decode($annotationsEScoded, true);
-				echo 'Loaded annotations in Spanish<br>';
+			if (file_exists($language.'.annotations.json')) {
+				$annotationsLanguagecoded = file_get_contents($language.'.annotations.json');
+				$annotationsLanguage = json_decode($annotationsLanguagecoded, true);
+				echo 'Loaded annotations in language '.$language.'<br>';
 			}
-			if (file_exists('ES.annotationsDerived.json')) {
-				$annotationsESDcoded = file_get_contents('ES.annotationsDerived.json');
-				$annotationsESD = json_decode($annotationsESDcoded, true);
-				echo 'Loaded annotations Derived in Spanish<br>';
+			if (file_exists($language.'.annotationsDerived.json')) {
+				$annotationsLanguageDcoded = file_get_contents($language.'.annotationsDerived.json');
+				$annotationsLanguageD = json_decode($annotationsLanguageDcoded, true);
+				echo 'Loaded annotations Derived in '.$language.'<br>';
 			}
+			
+			// Load version 17 file as fallback
+			$v17Filename = 'emojis-17-'.$language.'.json';
+			if (file_exists($v17Filename)) {
+				$v17Coded = file_get_contents($v17Filename);
+				$v17Decoded = json_decode($v17Coded, true);
+				// Index version 17 entries by sample or id for quick lookup
+				if (isset($v17Decoded['emojis'])) {
+					foreach ($v17Decoded['emojis'] as $v17Item) {
+						$emojisLanguageV17[$v17Item['sample']] = $v17Item;
+					}
+				}
+				echo 'Loaded version 17 fallback file: '.$v17Filename.'<br>';
+			}
+
 			// print_r($annotationsPT['annotations']['annotations']);
 			foreach($emojisEN['emojis'] as $emj) {
 				// print_r($emj['sample']);
@@ -640,22 +659,30 @@ echo'<div id=owner-server-content>';
 				$subcat =  $emj['subcat'];
 				$name = '';
 				$keywords = [];
-				if (isset($annotationsES['annotations']['annotations'][$sample])) {
-					$name = implode(", ", $annotationsES['annotations']['annotations'][$sample]['tts']);
-					$keywords = $annotationsES['annotations']['annotations'][$sample]['default'];
+				
+				if (isset($annotationsLanguage['annotations']['annotations'][$sample])) {
+					$name = implode(", ", $annotationsLanguage['annotations']['annotations'][$sample]['tts']);
+					$keywords = $annotationsLanguage['annotations']['annotations'][$sample]['default'];
 				} else {
-					if (isset($annotationsESD['annotationsDerived']['annotations'][$sample])) {
-						$name = implode(", ", $annotationsESD['annotationsDerived']['annotations'][$sample]['tts']);
-						$keywords = $annotationsESD['annotationsDerived']['annotations'][$sample]['default'];
+					if (isset($annotationsLanguageD['annotationsDerived']['annotations'][$sample])) {
+						$name = implode(", ", $annotationsLanguageD['annotationsDerived']['annotations'][$sample]['tts']);
+						$keywords = $annotationsLanguageD['annotationsDerived']['annotations'][$sample]['default'];
 					} else {
-						$name = $emj['name'];
-						$keywords = $emj['keywords'];
+						// Fallback to version 17 if available
+						if (isset($emojisLanguageV17[$sample])) {
+							$name = $emojisLanguageV17[$sample]['name'];
+							$keywords = $emojisLanguageV17[$sample]['keywords'];
+						} else {
+							// Final fallback to English
+							$name = $emj['name'];
+							$keywords = $emj['keywords'];
+						}
 					}
 				}
-				$emojisES['emojis'][] = ['id' => $id, 'code' => $code, 'sample' => $sample, 'cat' => $cat, 'subcat' => $subcat, 'name' => $name, 'keywords' => $keywords];
+				$emojisLanguage['emojis'][] = ['id' => $id, 'code' => $code, 'sample' => $sample, 'cat' => $cat, 'subcat' => $subcat, 'name' => $name, 'keywords' => $keywords];
 			}
-			file_put_contents('emojis-latest-ES.json', json_encode($emojisES, JSON_UNESCAPED_UNICODE));
-			echo 'Saved emojis-latest-ES.json';
+			file_put_contents('emojis-latest-'.$language.'.json', json_encode($emojisLanguage, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+			echo 'Saved emojis-latest-'.$language.'.json';
 		}
 	}
 	
